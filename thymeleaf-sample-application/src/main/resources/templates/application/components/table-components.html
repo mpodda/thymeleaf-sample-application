@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>.</title>
+</head>
+<body>
+
+	
+	<th:block th:fragment="basic-grid(data, fields)">
+		<tr th:each="record : ${data}">
+			<th:block th:each="field, iterator : ${fields}">
+				<td th:text="${record.__${field}__}"></td>
+			</th:block>
+		</tr>
+	</th:block>
+		
+	<th:block th:fragment="column-header1(field, text)" th:with="sortable=${sortable}, sortDirection=${sortDirection}, field=${field}, randomSuffix=${#strings.randomAlphanumeric(5)}">
+		<th scope="col" th:id="${field + '_' + randomSuffix}">
+			<span th:text="${text}"></span>
+			<th:block th:insert="~{ :: sort(sortable=${sortable})}"></th:block>
+		</th>
+		
+		<form action="#" th:id="${'sortGridForm' + '_' + randomSuffix}" th:object="${pagingAndSortingDto}">
+			<input type="text" th:value=${pagingAndSortingDto.viewName}  th:name="viewName" />
+			<input type="text" th:value="${field}" th:name="currentSortField" />
+			<input type="text" th:value="${pagingAndSortingDto.data}" th:name="data" />
+			<input type="text" th:value="${pagingAndSortingDto.pageOffset}" th:name="pageOffset" />
+		</form>
+		
+		<script type="text/javascript" th:inline="text">
+			document.querySelector("#[[${field + '_' + randomSuffix}]]").addEventListener("click", async () => {
+				const form = document.querySelector("#[[${'sortGridForm' + '_' + randomSuffix}]]");
+				const params = new FormData(form);
+				const uri = "[[@{/sort}]]";
+				
+				console.info("Sort:", "[[${field + '_' + randomSuffix}]]", "uri=", uri);
+				
+				let httpRequest = new XMLHttpRequest();
+				httpRequest.open("POST", uri, false);
+				httpRequest.send(params);
+			});
+		</script>
+	</th:block>
+	
+	<th:block th:fragment="old_fafafa(data, fields, fragmentsPath, actionsFragment)" th:with="randomSuffix=${#strings.randomAlphanumeric(5)}">
+		<form action="#" th:id="${'pagingForm' + '_' + randomSuffix}" th:object="${pagingAndSortingDto}">
+			<input type="text" th:value=${pagingAndSortingDto.viewName}  th:name="viewName" />
+			<input type="text" th:value="${pagingAndSortingDto.currentSortField}" th:name="currentSortField" />
+			<input type="text" th:value="${pagingAndSortingDto.data}" th:name="data" />
+			<input type="text" th:value="${pagingAndSortingDto.pageOffset}" th:name="pageOffset" />
+		</form>
+		
+		<script type="text/javascript" th:inline="text">
+		
+		</script>
+		
+		<tr th:each="record : ${data}"  th:with="customs = ${fragmentsPath} + ' :: ' + ${customsFragments}, actions = ${fragmentsPath} + ' :: ' + ${actionsFragment}">
+			<th:block th:each="field, iterator : ${fields}">
+				<td th:text="${record.__${field}__}"></td>
+			</th:block>
+			
+			<th:block th:insert="~{__${customs}__(${record})}"></th:block>
+			
+			<th:block th:insert="~{__${actions}__(${record})}"></th:block>
+		</tr>
+	</th:block>
+	
+	<th:block th:fragment="paginator(data)">
+		<nav aria-label="pagination" id="paginator">
+			<div class="btn-group">
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${1}" th:classappend="${'is-current'}" th:text="${1}"></button>
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${2}" th:text="${2}"></button>
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${3}" th:text="${3}"></button>
+			
+				<button>&hellip;</button>
+				
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${4}" th:text="${4}"></button>
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${5}" th:text="${5}"></button>
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${6}" th:text="${6}"></button>
+			</div>
+			
+			<div class="btn-group">
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnFirstPage" th:disabled="${false}"><i class="fa-solid fa-angles-left"></i></button>
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnPreviousPage" th:disabled="${false}"><i class="fa-solid fa-angle-left"></i></button>
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnNextPage" th:disabled="${false}"><i class="fa-solid fa-angle-right"></i></button>
+				<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnLastPage" th:disabled="${false}"><i class="fa-solid fa-angles-right"></i></button>
+			</div>
+		</nav>
+	</th:block>
+	
+	<th:block th:fragment="edit-button">
+		<td><button class="button" role="edit-host" th:data-id="${host.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
+	</th:block>
+	
+	<!-- === grid components ===  -->
+	
+	<th:block th:fragment="grid_2 (data, fields, paginator, fragmentsPath, headerFragment, actionsFragment, customsFragment, randomSuffix)">
+		<th:block th:insert="~{ :: grid(data=${data}, fields=${fields}, paginator=${paginator}, fragmentsPath=${fragmentsPath}, headerFragment=${headerFragment}, actionsFragment=${actionsFragment}, customsFragment=${customsFragment}, randomSuffix=${randomSuffix}) }"></th:block>
+	</th:block>
+	
+	<!-- sort -->
+	<th:block th:fragment="sort" th:with="sortable=${sortable}, sortDirection=${sortDirection}">
+		<th:block th:if="${sortable}">
+			<th:block th:if="${sortDirection == 'asc'}">
+				<span class="fa-solid fa-sort-up">&nbsp;</span>
+			</th:block>
+			
+			<th:block th:if="${sortDirection == 'desc'}">
+				<span>desc</span>
+				<span class="fa-solid fa-sort-down">&nbsp;</span>
+			</th:block>
+
+			<th:block th:if="${sortDirection == ''}">
+				<span class="fa-solid fa-sort">&nbsp;</span>
+			</th:block>
+			
+			<th:block th:unless="${sortDirection}">
+				<span class="fa-solid fa-sort">&nbsp;</span>
+			</th:block>
+		</th:block>
+		
+		<th:block th:unless="${sortable}"></th:block>
+	</th:block>
+	<!-- / sort -->
+	
+	<!-- Column Header -->
+	<th:block th:fragment="column-header(field, text, randomSuffix)" th:with="sortable=${sortable}, sortDirection=${sortDirection}, field=${field}">
+		<th scope="col" th:id="${field + '_' + randomSuffix}">
+			<span th:text="${text}"></span>
+			<th:block th:insert="~{ :: sort(sortable=${sortable}, sortDirection=${sortDirection})}"></th:block>
+		</th>
+	</th:block>
+	<!-- / Column Header -->
+	
+	<!-- grid  -->
+	<th:block th:fragment="grid(data, fields, fragmentsPath, actionsFragment,customsFragment, headerFragment)" th:with="randomSuffix=${randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${randomSuffix}, paginator=${paginator} == null ? false : ${paginator}, sortDirection = ${sortDirection} == null ? '' : ${sortDirection}">
+		<section>
+			<table class="table table-hover" role="grid-component" th:random-suffix="${randomSuffix}">
+				<thead>
+					<tr th:with="headers = ${fragmentsPath} + ' :: ' + ${headerFragment}" th:id="'head_' + ${randomSuffix}">
+						<th:block th:insert="~{__${headers}__(${randomSuffix}, ${sortDirection})}"></th:block>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr th:each="record : ${data}"  th:with="customs = ${fragmentsPath} + ' :: ' + ${customsFragment}, actions = ${fragmentsPath} + ' :: ' + ${actionsFragment}">
+						<th:block th:each="field, iterator : ${fields}">
+							<td th:text="${record.__${field}__}"></td>
+						</th:block>
+						
+						<th:block th:insert="~{__${customs}__(${record})}"></th:block>
+						
+						<th:block th:insert="~{__${actions}__(${record})}"></th:block>
+					</tr>
+				</tbody>
+			</table>
+	
+					
+	<!-- 		<form th:id="'sort_form_' + ${randomSuffix}" th:action="@{/sort}" th:object="${sortingDto}"> -->
+	<!-- 			<input type="hidden" name="currentSortField" th:field="*{currentSortField}" /> -->
+	<!-- 			<input type="hidden" name="currentSortDirection" th:field="*{currentSortDirection}" /> -->
+	<!-- 			<input type="hidden" name="randomSuffix" th:field="*{randomSuffix}" /> -->
+	<!-- 		</form> -->
+	
+	
+			<form th:id="'sort_form_' + ${randomSuffix}" th:action="@{/sort}">
+				<input type="hidden" name="currentSortField" th:value="${sortingDto.currentSortField}" />
+				<input type="hidden" name="currentSortDirection" th:value="${sortingDto.currentSortDirection}" />
+				<input type="hidden" name="randomSuffix" th:value="${sortingDto.randomSuffix}" />
+			</form>
+			
+			<th:block th:if="${paginator==true}">
+				<th:block th:insert="~{:: paginator(data=${data})}"></th:block>
+			</th:block>
+			
+			<script type="text/javascript" th:inline="text">
+			(async () => {
+				//await initSorting('[[${randomSuffix}]]');	
+			})();
+				
+			</script>
+		</section>
+	</th:block>
+	<!-- / grid  -->
+	
+	<!-- === / grid components ===  -->
+	
+</body>
+</html>

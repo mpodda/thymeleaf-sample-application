@@ -1,0 +1,39 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{thysa-layout.html}">
+
+<head>
+</head>
+
+	<section layout:fragment="content">
+		<h2>This is home</h2>
+		
+		<p>As Component </p>
+		<section id="continents-grid">
+			<th:block th:insert="~{application/components/table-components :: grid(data=${continents}, fields=${ {'id', 'name'} }, paginator=${true}, fragmentsPath='application/fragments/continent-fragments', headerFragment='continent-admin-headers', actionsFragment='continent-admin-actions', customsFragment='continent-customs')}"></th:block>
+		</section>
+		
+		<hr />
+		
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th scope="col">Id</th>
+						<th scope="col">Name</th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr th:each="continent : ${continents}">
+						<td th:text="${continent.id}"></td>
+						<td th:text="${continent.name}"></td>
+					</tr>
+				</tbody>
+			</table>
+		
+		
+		<button id="btnModel">Submit Model</button>
+	</section>
+	
+	<th:block layout:fragment="page-scripts">
+		<script th:src="@{/js/application/home.js}" type="module"></script>
+	</th:block>
+</html>

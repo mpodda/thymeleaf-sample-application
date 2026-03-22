@@ -1,0 +1,41 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{thysa-layout.html}">
+    <head></head>
+
+    <body>
+        <div th:fragment="menu">
+            <nav class="navbar navbar-expand-lg bg-body-tertiary">
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <!-- Parameters -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Παράμετροι</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Ήπηροι</a></li>
+                                <li><a class="dropdown-item" href="#">Χώρες</a></li>
+                                <li><a class="dropdown-item" href="#">Πόλεις</a></li>
+                            </ul>
+                        </li>
+                        <!-- Parameters -->
+                    
+                        <!-- Admin Persons -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Διαχείριση</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Άτομα</a></li>
+                            </ul>
+                        </li>
+                        <!-- / Admin Persons -->
+
+                        <!-- Search -->
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Αναζήτηση</a>
+                        </li>
+                        <!-- / Search -->
+                    </ul>
+
+                </div>
+            </nav>
+        </div>
+    </body>
+</html>

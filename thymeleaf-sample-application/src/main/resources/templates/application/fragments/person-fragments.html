@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>.</title>
+</head>
+<body>
+
+	<th:block th:fragment="persons-list">
+
+		<section layout:replace="~{application/components/table-components2 :: grid-fragment(sessionAttribute = 'persons')}">
+		
+			<table class="table table-hover" layout:fragment="grid-content">
+				<thead>
+					<tr>
+						<th th:replace="~{application/components/table-components2 :: column-header('Id','id')}"></th>
+						<th th:replace="~{application/components/table-components2 :: column-header('Name', 'name')}"></th>
+						<th th:replace="~{application/components/table-components2 :: column-header('Age','age')}"></th>
+						<th th:replace="~{application/components/table-components2 :: column-header('Date of Birth', 'dateOfBirth')}"></th>
+						<th></th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr th:each="record : ${persons}">
+						<td th:text="${record.id}"></td>
+						<td th:text="${record.name}"></td>
+						<td th:text="${record.age}"></td>
+						<td th:text="${record.dateOfBirth}"></td>
+						<td><button class="btn btn-light" role="edit-person" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</section>
+		
+	</th:block>
+</body>
+</html>

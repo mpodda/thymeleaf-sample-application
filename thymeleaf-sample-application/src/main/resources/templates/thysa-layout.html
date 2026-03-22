@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	
+	<link th:href="@{/css/fontawesome/css/fontawesome.min.css}" rel="stylesheet" />
+	<link th:href="@{/css/fontawesome/css/brands.css}" rel="stylesheet" />
+	<link th:href="@{/css/fontawesome/css/solid.css}" rel="stylesheet" />
+	
+	<link th:href="@{/css/thysa.css}" rel="stylesheet" />
+	
+	<link th:href="@{/layouts/bootstrap-5.3.8-dist/css/bootstrap.min.css}" rel="stylesheet" />
+	
+    <script type="text/javascript" th:inline="text">
+        // The following attempts to remove a jsession parameter that is being injected into the URL
+        // which is also being set as a cookie, and is therefore not necessary.
+        const contextPath = "[[@{/}]]".substring(0,
+            "[[@{/}]]".indexOf(";jsessionid") === -1 ?
+                "[[@{/}]]".length :
+                "[[@{/}]]".indexOf(";jsessionid"));
+        const token = '';
+    </script>
+    
+    
+	<script th:src="@{/js/application/paging.js}"></script>
+</head>
+
+
+<body>
+	<!-- Menu -->
+	<nav th:replace="~{menu :: menu}"></nav>
+	<!-- / Menu -->
+
+	<!-- Content -->
+	<section class="section" layout:fragment="content"></section>
+	<!-- / Content -->
+
+	<script th:src="@{/layouts/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js}" type="text/javascript"></script>
+
+	<script th:src="@{/js/application/sorting.js}" type="module"></script>
+	
+	<!-- Page Scripts -->
+	<th:block layout:fragment="page-scripts"></th:block>
+	<!-- / Page Scripts -->
+</body>
+</html>

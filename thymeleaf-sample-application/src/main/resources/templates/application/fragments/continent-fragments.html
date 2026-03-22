@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>.</title>
+</head>
+<body>
+	<th:block th:fragment="continent-admin-headers(randomSuffix, sortDirection)">
+		<th:block th:insert="~{application/components/table-components :: column-header(text='Id', field='id', randomSuffix=${randomSuffix}, sortable=${true}, sortDirection=${sortDirection})}"></th:block>
+		<th:block th:insert="~{application/components/table-components :: column-header(text='Name',field='name', randomSuffix=${randomSuffix}, sortable=${true}, sortDirection=${sortDirection})}"></th:block>
+		<th:block th:insert="~{application/components/table-components :: column-header(text='Name',field='name', randomSuffix=${randomSuffix}, sortable=${true}, sortDirection=${sortDirection})}"></th:block>
+		<th scope="col">Edit</th>
+		<th scope="col">Delete</th>
+	</th:block>
+	
+	<th:block th:fragment="continent-admin-actions(record)">
+		<td><button class="btn btn-light" role="edit-continent" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
+		<td><button class="btn btn-light" role="delete-continent" th:data-id="${record.id}" th:data-name="${record.name}"><i class="fa-solid fa-trash-can"></i></button></td>
+	</th:block>
+
+	
+	<th:block th:fragment="continent-customs(record)">
+		<td> <a th:href="@{/view?id=} + ${record.id}" th:text="${record.name}"></a></td>
+	</th:block>
+	
+	
+	
+	<th:block th:fragment="continents-list">
+
+		<section layout:replace="~{application/components/table-components2 :: grid-fragment (sessionAttribute = 'continents')}">
+		
+			<table class="table table-hover" layout:fragment="grid-content">
+				<thead>
+					<tr>
+						<th th:replace="~{application/components/table-components2 :: column-header('Id', 'id')}"></th>
+						<th th:replace="~{application/components/table-components2 :: column-header('Name', 'name')}"></th>
+						<th></th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr th:each="record : ${continents}">
+						<td th:text="${record.id}"></td>
+						<td th:text="${record.name}"></td>
+						<td><button class="btn btn-light" role="edit-continent" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</section>
+		
+	</th:block>
+</body>
+</html>
