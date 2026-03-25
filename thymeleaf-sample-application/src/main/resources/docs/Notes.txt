@@ -108,3 +108,37 @@
 	
 	Paging with Spring Session: https://chatgpt.com/c/698c5938-978c-832c-91ae-f42c9f56a3d1
 	
+	
+	
+	
+	
+		<th:block th:if="${paging}">
+			<section th:role="'grid-paging-' + ${randomSuffix}">
+				<nav aria-label="pagination" id="paginator">
+					<div class="btn-group">
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${1}" th:classappend="${'is-current'}" th:text="${1}"></button>
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${2}" th:text="${2}"></button>
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${3}" th:text="${3}"></button>
+					
+						<button>&hellip;</button>
+						
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${4}" th:text="${4}"></button>
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${5}" th:text="${5}"></button>
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${6}" th:text="${6}"></button>
+					</div>
+					
+					<div class="btn-group">
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnFirstPage" th:disabled="${false}"><i class="fa-solid fa-angles-left"></i></button>
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnPreviousPage" th:disabled="${false}"><i class="fa-solid fa-angle-left"></i></button>
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnNextPage" th:disabled="${false}"><i class="fa-solid fa-angle-right"></i></button>
+						<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnLastPage" th:disabled="${false}"><i class="fa-solid fa-angles-right"></i></button>
+					</div>
+				</nav>				
+			</section>
+			<p><span th:text=${pagingAndSortingDto.numberOfPages}></span> Pages</p>
+			<p>Page Numbers: <span th:text=${pagingAndSortingDto.pageNumbers}></span></p>
+		</th:block>	
+		
+		
+		<th:block th:fragment="grid" layout:fragment="grid-fragment(sessionAttribute)" th:with="randomSuffix=${randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${randomSuffix}, paging = (${paging} == null ? true : ${paging})">
+		

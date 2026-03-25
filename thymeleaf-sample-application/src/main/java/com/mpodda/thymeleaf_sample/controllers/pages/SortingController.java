@@ -1,56 +1,73 @@
 package com.mpodda.thymeleaf_sample.controllers.pages;
 
-import java.lang.reflect.Field;
-import java.text.NumberFormat;
-import java.util.Comparator;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.beans.support.SortDefinition;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import com.mpodda.thymeleaf_sample.domain.dto.BaseIdentifiableDto;
-import com.mpodda.thymeleaf_sample.domain.dto.PagingAndSortingDto;
+import com.mpodda.thymeleaf_sample.config.WebConfiguration;
+import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
+import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingAndSortingDto;
 import com.mpodda.thymeleaf_sample.domain.enums.PagingAndSortingConstants;
 import com.mpodda.thymeleaf_sample.domain.enums.SessionalConstants;
 import com.mpodda.thymeleaf_sample.utils.Serializer;
+import com.mpodda.thymeleaf_sample.web.PagingAndSortingService;
 
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 //@SessionAttributes({"pagingAndSortingDto", "data"})
-public class SortingController {
+public class SortingController<Dto extends BaseDto> {
+
+    private final WebConfiguration webConfiguration;
+
+	@SuppressWarnings("rawtypes")
+	@Autowired
+    private FindByIndexNameSessionRepository sessionRepository;
 
 	@Autowired
-    protected FindByIndexNameSessionRepository sessionRepository;
+	private PagingAndSortingService<Dto> pagingAndSortingService;
+	
+	@Value("${tsa.page-size}")
+	private int pageSize;
 
+    SortingController(WebConfiguration webConfiguration) {
+        this.webConfiguration = webConfiguration;
+    } 
+	
+	@SuppressWarnings({"unchecked", "null"})
 	@PostMapping("/sort")
-	public <Dto extends BaseIdentifiableDto> String sort(Model model, @ModelAttribute PagingAndSortingDto pagingAndSortingDto, HttpSession httpSession) {
-//		System.out.println(String.format("sort :: pagingAndSortingDto: %s", Serializer.objectToJsonString(pagingAndSortingDto)));
+	public String sort(Model model, @ModelAttribute PagingAndSortingDto pagingAndSortingDto, HttpSession httpSession) {
+		System.out.println(String.format("sort :: pagingAndSortingDto: %s", Serializer.objectToJsonString(pagingAndSortingDto)));
+		
+		Map<String, PagingAndSortingDto> map = new HashMap<String, PagingAndSortingDto>(); 
 		
 		pagingAndSortingDto = defineSortingDirection(pagingAndSortingDto);
 		
 		final String fieldName = pagingAndSortingDto.getCurrentSortField();
+		
 		final String sortDirection = pagingAndSortingDto.getCurrentSortDirection();
 		
 		Session session = this.sessionRepository.findById(httpSession.getId());
 		
 		if (session != null && session.getAttribute(SessionalConstants.DATA.value()) != null) {
+			Map<String, List<Dto>> map2 = (Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value());
+			//System.out.println(String.format("keySet: %s", map2.keySet()));
+			
 			List<Dto> data = ((Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value())).get(pagingAndSortingDto.getSessionAttribute());
-			//data = sortData(data, fieldName, sortDirection);
 			
 			PagedListHolder<Dto> pagedListHolder = new PagedListHolder<Dto>(data);
 			
-			SortDefinition sortDefinition = new SortDefinition() {
+			final SortDefinition sortDefinition = new SortDefinition() {
 				@Override
 				public boolean isIgnoreCase() {
 					return true;
@@ -70,174 +87,45 @@ public class SortingController {
 			pagedListHolder.setSort(sortDefinition);
 			pagedListHolder.resort();
 			
-			pagedListHolder.setPageSize(PagingAndSortingConstants.PAGE_SIZE.intValue());
+			pagedListHolder.setPageSize(this.pageSize);
 			pagedListHolder.setPage(PagingAndSortingConstants.DEFAULT_PAGE.intValue());
+			
+			
+			pagingAndSortingDto = this.pagingAndSortingService.updatePagingData(pagingAndSortingDto, pagedListHolder);
+			
+			//System.out.println(String.format("sort :: pagingAndSortingDto: %s", Serializer.objectToJsonString(pagingAndSortingDto)));
 			
 			model.addAttribute(pagingAndSortingDto.getSessionAttribute(), pagedListHolder.getPageList());
 			
-			//model.addAttribute(pagingAndSortingDto.getSessionAttribute(), data);
+			map.put(pagingAndSortingDto.getSessionAttribute(), pagingAndSortingDto);
 			
-			//model.addAttribute(sortingDto.getSessionAttribute(), sortData(((Map<String, List<? extends BaseIdentifiableDto>>)session.getAttribute("data")).get(sortingDto.getSessionAttribute()), fieldName, sortDirection));
+			final String sessionAttribute = pagingAndSortingDto.getSessionAttribute();
+			
+			map2.keySet().forEach(key-> {
+				if (!key.equals(sessionAttribute)) {
+					map.put(key, new PagingAndSortingDto());
+				}
+			});
+			
+			model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), map);
+			
+		} else {
+			//TODO: Send an message to a REST end point. End point will transfer the message to via Web socket in order to "refresh" somehow the page in question to create session.
+			//TODO: Investigate later the above idea. ACHTUNG!!! Do not create infinite loop. If after message sending the code lands here again, raise error message to user and 
+			//      do not resent message
 		}
 		
-		return new StringBuilder("application").append(pagingAndSortingDto.getViewName()).toString();
+		//TODO: Use constant
+		//return new StringBuilder("application").append(pagingAndSortingDto.getViewName()).toString();
+		
+//		return new StringBuilder("application").append("/home2").toString();
+		
+		//return "application/fragments/persons-fragments :: persons-list";
+		
+		return new StringBuilder("application/fragments/").append(pagingAndSortingDto.getSessionAttribute()).append("-fragments :: ").append(pagingAndSortingDto.getSessionAttribute()).append("-list").toString();
+		
 	}
-	
-	
-//	private static <Dto extends BaseIdentifiableDto> List<Dto> sortData(List<Dto> data, final String fieldName, final String sortDirection) {
-//		data.sort(new Comparator<Dto>() {
-//			@Override
-//			public int compare(Dto o1, Dto o2) {
-//				try {
-//					Field field1 = ReflectionUtils.findField(o1.getClass(), fieldName);
-//					field1.setAccessible(true);
-//					
-//					Field field2 = ReflectionUtils.findField(o2.getClass(), fieldName);
-//					field2.setAccessible(true);
-//					
-//					final Object valueO1 = field1.get(o1);
-//					final Object valueO2 = field2.get(o2);
-//					
-//					final Class<?> clazz = field1.getType();
-//					
-//					if (clazz == java.lang.String.class) {
-//						return getDifferenceOfStrings(valueO1.toString(), valueO2.toString(), sortDirection);
-//					}
-//					
-//					if (isNumeric(clazz)) {
-//						final Number number1 = NumberFormat.getInstance().parse(valueO1.toString());
-//						final Number number2 = NumberFormat.getInstance().parse(valueO2.toString());
-//						
-//						return getDifferenceOfNumbers(number1, number2, sortDirection, clazz);
-//					}
-//					
-//					if (isBoolean(clazz)) {
-//						if (clazz == java.lang.Boolean.class) {
-//							return getDifferenceOfBooleans((Boolean)valueO1, (Boolean)valueO2, sortDirection);
-//						}
-//						
-//						return getDifferenceOfBooleans((boolean)valueO1, (boolean)valueO2, sortDirection);
-//					}
-//					
-//					if (clazz == java.util.Date.class) {
-//						return getDifferenceOfDates((Date)valueO1, (Date)valueO2, sortDirection);
-//					}
-//					
-//					/* Default */
-//					return getDifferenceOfStrings(valueO1.toString(), valueO2.toString(), sortDirection);
-//					
-//				} catch (Exception e) {
-//					System.err.println(String.format("Error sorting: %s", e.getMessage()));
-//				}
-//				
-//				return 0;
-//			}
-//		});
-//		
-//		return data;
-//	}
-	
-//	private static boolean isNumeric(final Class<?> clazz) {
-//		return (
-//				clazz == java.lang.Integer.class || 
-//				clazz == java.lang.Long.class || 
-//				clazz == java.lang.Byte.class ||
-//				clazz == int.class ||
-//				clazz == long.class ||
-//				clazz == byte.class
-//			);
-//	
-//	}
-	
-//	private static boolean isBoolean(final Class<?> clazz) {
-//		return  clazz == java.lang.Boolean.class || clazz == boolean.class;
-//	}
-	
-//	private static int getDifferenceOfNumbers(final Number number1, final Number number2, final String sortDirection, final Class<?> clazz) {
-//		/* Desc */
-//		if (sortDirection.equals("desc")) {
-//			if (clazz == java.lang.Long.class || clazz == long.class) {
-//				if (number1.longValue() > number2.longValue()) {
-//					return -1;
-//				}
-//				
-//				return 1;
-//			}
-//			
-//			if (clazz == java.lang.Integer.class || clazz == int.class) {
-//				if (number1.intValue() > number2.intValue()) {
-//					return -1;
-//				}
-//				
-//				return 1;
-//			}
-//			
-//			if (clazz == java.lang.Byte.class || clazz == byte.class) {
-//				if (number1.byteValue() > number2.byteValue()) {
-//					return -1;
-//				}
-//				
-//				return 1;
-//			}
-//		}
-//		
-//		/* Asc */
-//		if (clazz == java.lang.Long.class || clazz == long.class) {
-//			if (number1.longValue() > number2.longValue()) {
-//				return 1;
-//			}
-//			
-//			return -1;
-//		}
-//								
-//		if (clazz == java.lang.Integer.class || clazz == int.class) {
-//			if (number1.intValue() > number2.intValue()) {
-//				return 1;
-//			}
-//			
-//			return -1;
-//		}
-//		
-//		if (clazz == java.lang.Byte.class || clazz == byte.class) {
-//			if (number1.intValue() > number2.intValue()) {
-//				return 1;
-//			}
-//			
-//			return -1;			
-//		}
-//		
-//		return 0;
-//	}
-	
-//	private static int getDifferenceOfBooleans(final Boolean booleanValue1, final Boolean booleanValue2, final String sortDirection) {
-//		/* Asc */
-//		if (sortDirection.equals("asc")) {
-//			return (booleanValue1.compareTo(booleanValue2));
-//		}
-//		
-//		/* Desc */
-//		return booleanValue2.compareTo(booleanValue1);
-//	}
-	
-//	private static int getDifferenceOfStrings(final String stringValue1, final String stringValue2, final String sortDirection) {
-//		/* Asc */
-//		if (sortDirection.equals("asc")) {
-//			return stringValue1.compareToIgnoreCase(stringValue2);
-//		}
-//		
-//		/* Desc */
-//		return stringValue2.compareToIgnoreCase(stringValue1);
-//	}
-	
-//	private static int getDifferenceOfDates(final Date dateValue1, final Date dateValue2, final String sortDirection) {
-//		/* Asc */
-//		if (sortDirection.equals("asc")) {
-//			return dateValue1.compareTo(dateValue2);
-//		}
-//		
-//		/* Desc */
-//		return dateValue2.compareTo(dateValue1);
-//	}
+
 	
 	private static PagingAndSortingDto defineSortingDirection(PagingAndSortingDto sortingDto) {
 		if (sortingDto.getCurrentSortDirection() == "") {

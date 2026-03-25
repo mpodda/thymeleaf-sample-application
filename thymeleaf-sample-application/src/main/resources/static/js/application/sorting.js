@@ -2,9 +2,10 @@ import * as app from './thysa-application.js';
 
 (async () => {
 	let gridComponents = null;
-	let sortForm = null;
+	//let sortForm = null;
+	let randomSuffixes = [];
 	
-	async function applySortEvents(header, gridComponent) {
+	async function applySortEvents(sortForm, header, gridComponent) {
 		let headers = header.querySelectorAll("th");
 		
 		for (const header of headers) {
@@ -17,11 +18,17 @@ import * as app from './thysa-application.js';
 	async function sort(form, field, gridComponent) {
 		form.currentSortField.value = field;
 		
+		console.info("form=", form);
+		
 		const httpRequest = await app.postFormSync(form, form.getAttribute("action"));
 		
-		//console.info("Response: ", httpRequest.responseText);
+		console.info("randomSuffixes", randomSuffixes);
+//		console.info("Response: ", httpRequest.responseText);
 		//console.info("gridComponent=", gridComponent.childNodes[1]);
 //		console.info("gridComponent=", gridComponent);
+		
+		//console.info("Current suffix ", gridComponent.querySelectorAll('[role="grid-content"]')[0].getAttribute("random-suffix"));
+		
 		
 		//TODO: Improve later
 		//await app.setContent (httpRequest.responseText, gridComponent);
@@ -30,7 +37,7 @@ import * as app from './thysa-application.js';
 		/* Header handling */
 		const header = gridComponent.getElementsByTagName('thead')[0];
 		const newHeader = app.createHTMLFragmentFromTag(httpRequest.responseText, 'thead');
-		await applySortEvents(newHeader, gridComponent);
+		await applySortEvents(form, newHeader, gridComponent);
 		gridComponent.getElementsByTagName('table')[0].replaceChild(newHeader, header);
 		
 		/* Content handling */
@@ -51,9 +58,18 @@ import * as app from './thysa-application.js';
 		
 		await app.intecommunication.onDataChange();
 	}
-	 
+	
+	function gridComponentRandomSuffix(gridComponent) {
+		return gridComponent.querySelectorAll('[role="grid-content"]')[0].getAttribute("random-suffix");
+	}
+	
 	async function initSorting(gridComponent) {
-		sortForm = gridComponent.querySelectorAll('[grid-form-type="sort-form"]')[0];
+		//sortForm = gridComponent.querySelectorAll('[grid-form-type="sort-form"]')[0];
+		
+		const sortFormCollector = `[grid-form-id="sort-form-${gridComponentRandomSuffix(gridComponent)}"]`;
+		console.info("sortFormCollector=", sortFormCollector);
+		
+		let sortForm = gridComponent.querySelectorAll(sortFormCollector)[0];
 		
 		let headers = gridComponent.querySelectorAll("th");
 
@@ -64,6 +80,8 @@ import * as app from './thysa-application.js';
 				sort(sortForm, header.getAttribute("sort-field"), gridComponent);
 			});
 		}
+		
+		randomSuffixes.push(gridComponent.querySelectorAll('[role="grid-content"]')[0].getAttribute("random-suffix"));
 	}
 	
 	async function init() {

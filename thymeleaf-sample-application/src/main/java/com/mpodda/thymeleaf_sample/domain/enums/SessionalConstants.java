@@ -1,7 +1,9 @@
 package com.mpodda.thymeleaf_sample.domain.enums;
 
 public enum SessionalConstants {
-	DATA("data");
+	DATA("data"),
+	PAGING_AND_SORTING_MODEL_ATTRIBUTE("pagingAndSortingDto")
+	;
 	
 	private String value;
 	

@@ -1,15 +1,9 @@
-package com.mpodda.thymeleaf_sample.domain.dto;
+package com.mpodda.thymeleaf_sample.domain.dto.ps;
 
 import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.List;
 
-import org.apache.commons.lang3.RandomStringUtils;
+import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 
 public class PagingAndSortingDto extends BaseDto implements Serializable {
 	private static final long serialVersionUID = -8711706368363317655L;
@@ -20,6 +14,18 @@ public class PagingAndSortingDto extends BaseDto implements Serializable {
 	private Integer pageNumber;
 	
 	private Integer numberOfPages;
+	
+	private List<PageNumberDto> pageNumbers;
+	
+	private List<Integer> firstPageNumbers;
+	
+	private List<Integer> lastPageNumbers;
+	
+	private Integer previousPageNumber;
+	
+	private Integer nextPageNumber;
+	
+	private transient List<? extends BaseDto> pageData;
 
 	/* Sorting */
 	private String currentSortField;
@@ -33,6 +39,7 @@ public class PagingAndSortingDto extends BaseDto implements Serializable {
 	private String randomSuffix;
 	
 	private String sessionAttribute;
+	
 
 	public Integer getPageOffset() {
 		return pageOffset;
@@ -104,5 +111,53 @@ public class PagingAndSortingDto extends BaseDto implements Serializable {
 
 	public void setSessionAttribute(String sessionAttribute) {
 		this.sessionAttribute = sessionAttribute;
+	}
+	
+	public List<PageNumberDto> getPageNumbers() {
+		return pageNumbers;
+	}
+
+	public void setPageNumbers(List<PageNumberDto> pageNumbers) {
+		this.pageNumbers = pageNumbers;
+	}
+	
+	public Integer getPreviousPageNumber() {
+		return previousPageNumber;
+	}
+
+	public void setPreviousPageNumber(Integer previousPageNumber) {
+		this.previousPageNumber = previousPageNumber;
+	}
+
+	public Integer getNextPageNumber() {
+		return nextPageNumber;
+	}
+
+	public void setNextPageNumber(Integer nextPageNumber) {
+		this.nextPageNumber = nextPageNumber;
+	}
+
+	public List<? extends BaseDto> getPageData() {
+		return pageData;
+	}
+
+	public void setPageData(List<? extends BaseDto> pageData) {
+		this.pageData = pageData;
+	}
+
+	public List<Integer> getFirstPageNumbers() {
+		return firstPageNumbers;
+	}
+
+	public void setFirstPageNumbers(List<Integer> firstPageNumbers) {
+		this.firstPageNumbers = firstPageNumbers;
+	}
+
+	public List<Integer> getLastPageNumbers() {
+		return lastPageNumbers;
+	}
+
+	public void setLastPageNumbers(List<Integer> lastPageNumbers) {
+		this.lastPageNumbers = lastPageNumbers;
 	}
 }

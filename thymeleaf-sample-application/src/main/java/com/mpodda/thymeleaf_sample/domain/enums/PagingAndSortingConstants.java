@@ -1,7 +1,7 @@
 package com.mpodda.thymeleaf_sample.domain.enums;
 
 public enum PagingAndSortingConstants {
-	PAGE_SIZE(5),
+	/*PAGE_SIZE(5),*/
 	DEFAULT_PAGE(0),
 	DEFALUT_SORTING_DIRECTION("asc"),
 	ASC("asc"),

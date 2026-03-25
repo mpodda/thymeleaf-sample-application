@@ -6,49 +6,60 @@
     <title>.</title>
 </head>
 
-<th:block th:fragment="grid" layout:fragment="grid-fragment(sessionAttribute)" th:with="randomSuffix=${randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${randomSuffix}, paging = (${paging} == null ? true : ${paging})">
+<th:block th:fragment="grid" layout:fragment="grid-fragment(sessionAttribute)" th:with="randomSuffix=${pagingAndSortingDto.get(sessionAttribute).randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${pagingAndSortingDto.get(sessionAttribute).randomSuffix}, paging = (${paging} == null ? true : ${paging})">
 	<section role="grid-component">
-		<section role="grid-content">
-			<section layout:fragment="grid-content" th:random-suffix="${randomSuffix}"></section>
+		<section role="grid-content" th:random-suffix="${randomSuffix}">
+			<section layout:fragment="grid-content"></section>
 		</section>	
 
 		<th:block th:if="${paging}">
 			<section th:role="'grid-paging-' + ${randomSuffix}">
 				<nav aria-label="pagination" id="paginator">
-					<div class="btn-group">
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${1}" th:classappend="${'is-current'}" th:text="${1}"></button>
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${2}" th:text="${2}"></button>
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${3}" th:text="${3}"></button>
-					
-						<button>&hellip;</button>
+					<ul class="pagination">
+						<li class="page-item"><button role="page-link" aria-current="page" th:data-page-number="1" class="page-link">&laquo;</button></li>
+						<li class="page-item"><button role="page-link" aria-current="page" th:data-page-number="${pagingAndSortingDto.get(sessionAttribute).previousPageNumber}" class="page-link">&lsaquo;</button></li>
+
+						<th:block th:if="${!pagingAndSortingDto.get(sessionAttribute).firstPageNumbers.isEmpty()}">
+							<li th:each="pageNumber, iterator:${pagingAndSortingDto.get(sessionAttribute).firstPageNumbers}" class="page-item"><button role="page-link" aria-current="page" th:data-page-number="${pageNumber}" class="page-link" th:text="${pageNumber}"></button></li>
+							<li class="page-item disabled"><button role="page-link" aria-current="page" class="page-link">&hellip;</button></li>
+						</th:block>
 						
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${4}" th:text="${4}"></button>
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${5}" th:text="${5}"></button>
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" th:id="'page' + ${6}" th:text="${6}"></button>
-					</div>
-					
-					<div class="btn-group">
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnFirstPage" th:disabled="${false}"><i class="fa-solid fa-angles-left"></i></button>
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnPreviousPage" th:disabled="${false}"><i class="fa-solid fa-angle-left"></i></button>
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnNextPage" th:disabled="${false}"><i class="fa-solid fa-angle-right"></i></button>
-						<button role="page-link" th:data-href="${''}" class="btn btn-light" id="btnLastPage" th:disabled="${false}"><i class="fa-solid fa-angles-right"></i></button>
-					</div>
+						<th:block th:each="pageNumber, iterator:${pagingAndSortingDto.get(sessionAttribute).pageNumbers}">
+							<li class="page-item" th:classappend="${pageNumber.isCurrentPage} ? 'active':''" ><button role="page-link" aria-current="page" th:data-page-number="${pageNumber.value}" class="page-link" th:text="${pageNumber.value}"></button></li>						
+						</th:block>
+
+						<th:block th:if="${!pagingAndSortingDto.get(sessionAttribute).lastPageNumbers.isEmpty()}">
+							<li class="page-item disabled"><button role="page-link" aria-current="page" class="page-link">&hellip;</button></li>
+							<li th:each="pageNumber, iterator:${pagingAndSortingDto.get(sessionAttribute).lastPageNumbers}" class="page-item"><button role="page-link" aria-current="page" th:data-page-number="${pageNumber}" class="page-link" th:text="${pageNumber}"></button></li>
+						</th:block>
+						
+						<li class="page-item"><button role="page-link" aria-current="page" th:data-page-number="${pagingAndSortingDto.get(sessionAttribute).nextPageNumber}" class="page-link">&rsaquo;</button></li>
+						<li class="page-item"><button role="page-link" aria-current="page" th:data-page-number="${pagingAndSortingDto.get(sessionAttribute).numberOfPages}" class="page-link">&raquo;</button></li>
+					</ul>					
 				</nav>				
 			</section>
 		</th:block>
 			
-		<form grid-form-type="sort-form" th:action="@{/sort}">
-			<input type="hidden" name="currentSortField" th:value="${pagingAndSortingDto.currentSortField}" />
-			<input type="hidden" name="currentSortDirection" th:value="${pagingAndSortingDto.currentSortDirection}" />
-			<input type="hidden" name="randomSuffix" th:value="${randomSuffix}" />
+<!-- 		<form grid-form-type="sort-form" th:action="@{/sort}"> -->
+<!-- 			<input type="hidden" name="currentSortField" th:value="${pagingAndSortingDto.currentSortField}" /> -->
+<!-- 			<input type="hidden" name="currentSortDirection" th:value="${pagingAndSortingDto.currentSortDirection}" /> -->
+<!-- 			<input type="hidden" name="randomSuffix" th:value="${randomSuffix}" /> -->
+<!-- 			<input type="hidden" name="viewName" th:value="${currentUrl}" /> -->
+<!-- 			<input type="hidden" name="sessionAttribute" th:value="${sessionAttribute}" /> -->
+<!-- 		</form> -->
+
+		<form th:grid-form-id="'sort-form-' + ${randomSuffix}" th:action="@{/sort}">
+			<input type="hidden" name="currentSortField" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortField}" />
+			<input type="hidden" name="currentSortDirection" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortDirection}" />
+			<input type="hidden" name="randomSuffix" th:value="${pagingAndSortingDto.get(sessionAttribute).randomSuffix == null ? randomSuffix : pagingAndSortingDto.get(sessionAttribute).randomSuffix}" />
 			<input type="hidden" name="viewName" th:value="${currentUrl}" />
-			<input type="hidden" name="sessionAttribute" th:value="${sessionAttribute}" />
+			<input type="hidden" name="sessionAttribute" th:value="${pagingAndSortingDto.get(sessionAttribute).sessionAttribute == null ? sessionAttribute : pagingAndSortingDto.get(sessionAttribute).sessionAttribute}" />
 		</form>
 		
 	</section>
 </th:block>
 
-<th th:fragment="column-header(text, sortField)" scope="col" th:with="sortDirection = (${pagingAndSortingDto.currentSortField} == ${sortField} ?  ${pagingAndSortingDto.currentSortDirection} : '')" th:sort-field="${sortField}" th:data-type="${dataType}" style="cursor: pointer;">
+<th th:fragment="column-header(text, sortField)" scope="col" th:with="sortDirection = (${pagingAndSortingDto.get(sessionAttribute).currentSortField} == ${sortField} ?  ${pagingAndSortingDto.get(sessionAttribute).currentSortDirection} : '')" th:sort-field="${sortField}" th:data-type="${dataType}" style="cursor: pointer;">
 	<span th:text="${text}"></span>
 	<th:block th:insert="~{ :: sort(sortDirection=${sortDirection})}"></th:block>
 </th>

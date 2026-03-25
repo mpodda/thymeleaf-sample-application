@@ -1,7 +1,6 @@
 package com.mpodda.thymeleaf_sample.aspects;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -12,14 +11,10 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.hibernate.query.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.support.PagedListHolder;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.stereotype.Component;
@@ -28,18 +23,27 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
-import com.mpodda.thymeleaf_sample.domain.dto.BaseIdentifiableDto;
-import com.mpodda.thymeleaf_sample.domain.enums.PagingAndSortingConstants;
+import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
+import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingAndSortingDto;
 import com.mpodda.thymeleaf_sample.domain.enums.SessionalConstants;
+import com.mpodda.thymeleaf_sample.web.PagingAndSortingService;
 
 import jakarta.servlet.http.HttpSession;
 @Aspect
 @Component
-public class SessionalAspectService {
+public class SessionalAspectService <Dto extends BaseDto> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionalAspectService.class);
 	
+	@Value("${tsa.page-size}")
+	private int pageSize; 
+
+	
+	@SuppressWarnings("rawtypes")
 	@Autowired
-    protected FindByIndexNameSessionRepository sessionRepository;
+    private FindByIndexNameSessionRepository sessionRepository;
+	
+	@Autowired
+	private PagingAndSortingService<Dto> pagingAndSortingService;
 	
 	
 	@Pointcut("within(com.mpodda.thymeleaf_sample.controllers.pages..*)")
@@ -47,8 +51,9 @@ public class SessionalAspectService {
 		
 	}
 	
+	@SuppressWarnings({"unchecked", "null"})
 	@After ("anyPageControllerExecution()  && args(model, httpSession,..)")
-	public <Dto extends BaseIdentifiableDto> void afterPageControllerExecution(JoinPoint joinPoint, Model model, HttpSession httpSession) {
+	public /*<Dto extends BaseDto>*/ void afterPageControllerExecution(JoinPoint joinPoint, Model model, HttpSession httpSession) {
 		final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 
 		final boolean isSessionalMethod = (methodSignature.getMethod().getAnnotation(SessionalMethod.class) != null);
@@ -56,7 +61,9 @@ public class SessionalAspectService {
 		if (isSessionalMethod) {
 			final String[] sessionAttributeNames = methodSignature.getMethod().getAnnotation(SessionalMethod.class).sessionAttributeNames();
 			
-			Map<String, List<? extends BaseIdentifiableDto>> map = new HashMap<String, List<? extends BaseIdentifiableDto>>();
+			Map<String, List<Dto>> map = new HashMap<String, List<Dto>>();
+			
+			Map<String, PagingAndSortingDto> map2 = (Map<String, PagingAndSortingDto>)model.getAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value());
 		
 			LOGGER.info("Try to get Session from repository with id: {}", httpSession.getId());
 			
@@ -66,7 +73,7 @@ public class SessionalAspectService {
 				session = this.sessionRepository.createSession();
 				LOGGER.info("No session found. New one created with id: {}", session.getId());
 				
-				//TODO: Improve later if Spring Security is introduced. Find other sessions in repository by principal and delete them 
+				//TODO: Improve later if Spring Security is introduced. Find other sessions in repository by principal and delete them.
 			}
 			
 			for (int i=0; i<methodSignature.getDeclaringType().getMethods().length; i++) {
@@ -80,17 +87,27 @@ public class SessionalAspectService {
 						Method method = methodSignature.getDeclaringType().getMethods()[i];
 						
 						try {
-							//List<? extends BaseIdentifiableDto> data = (List<? extends BaseIdentifiableDto>)method.invoke(joinPoint.getTarget(), null);
-							List<Dto> data = (List<Dto>)method.invoke(joinPoint.getTarget(), null);
+							List<Dto> data = (List<Dto>)method.invoke(joinPoint.getTarget());
 							
 							final boolean paging = methodSignature.getDeclaringType().getMethods()[i].getAnnotation(SessionalDto.class).paging();
 							
 							if (paging) {
-								PagedListHolder<Dto> pagedListHolder = new PagedListHolder<Dto>(data);
-								pagedListHolder.setPageSize(PagingAndSortingConstants.PAGE_SIZE.intValue());
-								pagedListHolder.setPage(PagingAndSortingConstants.DEFAULT_PAGE.intValue());
+								/*
+								PagingAndSortingDto pagingAndSortingDto = (PagingAndSortingDto)model.getAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value());
+								pagingAndSortingDto = this.pagingAndSortingService.pagingSetup(pagingAndSortingDto, data);
 								
-								model.addAttribute(sessionAttributeName, pagedListHolder.getPageList());
+								model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), pagingAndSortingDto);
+								model.addAttribute(sessionAttributeName, pagingAndSortingDto.getPageData());
+
+								System.out.println(String.format("%s Total Pages", pagingAndSortingDto.getNumberOfPages()));
+								*/
+								
+								PagingAndSortingDto pagingAndSortingDto = new PagingAndSortingDto();
+								pagingAndSortingDto = this.pagingAndSortingService.pagingSetup(pagingAndSortingDto, data);
+								map2.put(sessionAttributeName, pagingAndSortingDto);
+								model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), map2);
+								
+								model.addAttribute(sessionAttributeName, pagingAndSortingDto.getPageData());
 							} else {
 								model.addAttribute(sessionAttributeName, data);	
 							}
@@ -111,38 +128,4 @@ public class SessionalAspectService {
 			}
 		}
 	}
-	
-//	@Pointcut("@annotation(com.mpodda.thymeleaf_sample.annotations.SessionalDto)")
-//	private void sesso() {
-//		System.out.println("Call sesso()");
-//	}
-	
-//	@Around("@annotation(com.mpodda.thymeleaf_sample.annotations.SessionalDto)")
-//	public void aroundSessionalDto(ProceedingJoinPoint joinPoint) {
-//		System.out.println("Call aroundSessionalDto()");
-//	}
-
-//	public static void main(String[] args) {
-//		System.out.println("Hello!");
-//		
-//		List<String> sList = new ArrayList<String>();
-//		sList.add("A");sList.add("B");sList.add("C");sList.add("D");sList.add("E");
-//
-//		PagedListHolder<String> pagedListHolder = new PagedListHolder<String>(sList);
-//		pagedListHolder.setPageSize(2);
-//		pagedListHolder.setPage(0);
-//		
-//		System.out.println(String.format("Page 1: %s", pagedListHolder.getPageList()));
-//		pagedListHolder.nextPage();
-//		System.out.println(String.format("Page 2: %s", pagedListHolder.getPageList()));
-//		
-//		/*
-//		Pageable pageable = PageRequest.of(0, 2);
-//		
-//		PageImpl<String> pageImpl = new PageImpl<String>(sList, pageable, 0);
-//		
-//		System.out.println(String.format("Content: %s", pageImpl.getContent()));
-//		*/
-//		
-//	}
 }
