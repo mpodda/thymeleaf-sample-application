@@ -61,8 +61,6 @@ public class SortingController<Dto extends BaseDto> {
 		
 		if (session != null && session.getAttribute(SessionalConstants.DATA.value()) != null) {
 			Map<String, List<Dto>> map2 = (Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value());
-			//System.out.println(String.format("keySet: %s", map2.keySet()));
-			
 			List<Dto> data = ((Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value())).get(pagingAndSortingDto.getSessionAttribute());
 			
 			PagedListHolder<Dto> pagedListHolder = new PagedListHolder<Dto>(data);
@@ -93,8 +91,6 @@ public class SortingController<Dto extends BaseDto> {
 			
 			pagingAndSortingDto = this.pagingAndSortingService.updatePagingData(pagingAndSortingDto, pagedListHolder);
 			
-			//System.out.println(String.format("sort :: pagingAndSortingDto: %s", Serializer.objectToJsonString(pagingAndSortingDto)));
-			
 			model.addAttribute(pagingAndSortingDto.getSessionAttribute(), pagedListHolder.getPageList());
 			
 			map.put(pagingAndSortingDto.getSessionAttribute(), pagingAndSortingDto);
@@ -119,8 +115,6 @@ public class SortingController<Dto extends BaseDto> {
 		//return new StringBuilder("application").append(pagingAndSortingDto.getViewName()).toString();
 		
 //		return new StringBuilder("application").append("/home2").toString();
-		
-		//return "application/fragments/persons-fragments :: persons-list";
 		
 		return new StringBuilder("application/fragments/").append(pagingAndSortingDto.getSessionAttribute()).append("-fragments :: ").append(pagingAndSortingDto.getSessionAttribute()).append("-list").toString();
 		

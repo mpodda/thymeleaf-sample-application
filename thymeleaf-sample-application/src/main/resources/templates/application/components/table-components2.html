@@ -39,14 +39,6 @@
 				</nav>				
 			</section>
 		</th:block>
-			
-<!-- 		<form grid-form-type="sort-form" th:action="@{/sort}"> -->
-<!-- 			<input type="hidden" name="currentSortField" th:value="${pagingAndSortingDto.currentSortField}" /> -->
-<!-- 			<input type="hidden" name="currentSortDirection" th:value="${pagingAndSortingDto.currentSortDirection}" /> -->
-<!-- 			<input type="hidden" name="randomSuffix" th:value="${randomSuffix}" /> -->
-<!-- 			<input type="hidden" name="viewName" th:value="${currentUrl}" /> -->
-<!-- 			<input type="hidden" name="sessionAttribute" th:value="${sessionAttribute}" /> -->
-<!-- 		</form> -->
 
 		<form th:grid-form-id="'sort-form-' + ${randomSuffix}" th:action="@{/sort}">
 			<input type="hidden" name="currentSortField" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortField}" />
