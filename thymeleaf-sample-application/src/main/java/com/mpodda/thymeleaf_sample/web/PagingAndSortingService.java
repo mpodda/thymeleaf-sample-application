@@ -128,7 +128,7 @@ public final class PagingAndSortingService<Dto extends BaseDto> {
 	}
 	
 	
-	private static List<PageNumberDto> definePageNumbers(PagingAndSortingDto pagingAndSortingDto, final int maxNumberOfPages) {
+	private static List<PageNumberDto> definePageNumbers(final PagingAndSortingDto pagingAndSortingDto, final int maxNumberOfPages) {
 		List<PageNumberDto> pageNumbersList = new ArrayList<PageNumberDto>(pagingAndSortingDto.getNumberOfPages() < maxNumberOfPages ? pagingAndSortingDto.getNumberOfPages() : maxNumberOfPages);
 		
 		List<Integer> allPageNumbers = new ArrayList<Integer>(pagingAndSortingDto.getNumberOfPages());
@@ -163,15 +163,21 @@ public final class PagingAndSortingService<Dto extends BaseDto> {
 			pageNumbers = allPageNumbers.subList(firstPageNumberPosition, lastPageNumberPosition + 1);
 		}
 		
+		System.out.println(String.format("Current Page Number: %s", pagingAndSortingDto.getPageNumber()));
+		
 		pageNumbers.forEach(pageNumber -> {
 			pageNumbersList.add (
 				new PageNumberDto(pageNumber)
-					.currentPage(pageNumber == pagingAndSortingDto.getPageNumber())
-					.firstPage(pageNumber == 1)
-					.lastPage(pageNumber == pagingAndSortingDto.getNumberOfPages()
+					.currentPage(pageNumber.equals(pagingAndSortingDto.getPageNumber()))
+					.firstPage(pageNumber.equals(1))
+					.lastPage(pageNumber.equals(pagingAndSortingDto.getNumberOfPages())
 				)
 			);
 		});
+		
+		System.out.println(String.format("pageNumbers: %s", pageNumbers));
+		
+		System.out.println(String.format("Current Page: %s", pageNumbersList.stream().filter(pgNrDto -> pgNrDto.isCurrentPage()).findFirst())); 
 		
 		
 		return pageNumbersList;

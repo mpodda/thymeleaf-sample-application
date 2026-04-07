@@ -86,7 +86,8 @@ public class SortingController<Dto extends BaseDto> {
 			pagedListHolder.resort();
 			
 			pagedListHolder.setPageSize(this.pageSize);
-			pagedListHolder.setPage(PagingAndSortingConstants.DEFAULT_PAGE.intValue());
+			//pagedListHolder.setPage(PagingAndSortingConstants.DEFAULT_PAGE.intValue());
+			pagedListHolder.setPage(pagingAndSortingDto.getPageNumber() == null ? PagingAndSortingConstants.DEFAULT_PAGE.intValue() : pagingAndSortingDto.getPageNumber() - 1);
 			
 			
 			pagingAndSortingDto = this.pagingAndSortingService.updatePagingData(pagingAndSortingDto, pagedListHolder);

@@ -22,9 +22,9 @@ import {intecommunication as app_itercom} from './thysa-application.js';
 
 		for (const editPersonButton of editPersonButtons) {
 			editPersonButton.addEventListener("click", async () => {
-				const condinentId = editPersonButton.getAttribute("data-id");
+				const personId = editPersonButton.getAttribute("data-id");
 				
-				console.info(`Edit person with id ${condinentId}`);
+				console.info(`Edit person with id ${personId}`);
 			});
 		}
 	}

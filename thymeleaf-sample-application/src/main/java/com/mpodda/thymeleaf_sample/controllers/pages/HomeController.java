@@ -67,7 +67,7 @@ public class HomeController extends BaseController {
 	}
 	
 	private List<PersonDto> loadPersons() {
-		return RandomDateGenerator.generateRandomPersons(70);
+		return RandomDateGenerator.generateRandomPersons(100);
 		
 		/*
 		List<PersonDto> personsList = new ArrayList<PersonDto>();
