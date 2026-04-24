@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
@@ -35,19 +34,13 @@ public class HomeController extends BaseController {
 	}
 	
 	@SessionalMethod(sessionAttributeNames = {"continents", "persons"})
-//	@SessionalMethod(sessionAttributeNames = {"persons"})
-	@GetMapping({"/home2"})
-    public String home2(Model model, HttpSession httpSession/*, @ModelAttribute PersonDto personDto*/) {
+	@GetMapping({"/home"})
+    public String home(Model model, HttpSession httpSession) {
 		this.continentsList = this.loadContinents();
 		
-		this.personsList = this.loadPersons();
-		
-		System.out.println("Home 2 before return");
-		
-		return "application/home2";
+		this.personsList = this.loadPersons();		
+		return "application/home";
 	}
-	
-
 
 	private List<ContinentDto> loadContinents() {
 		List<Continent> continents = new ArrayList<Continent>();

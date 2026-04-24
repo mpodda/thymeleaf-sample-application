@@ -29,6 +29,7 @@ import com.mpodda.thymeleaf_sample.domain.enums.SessionalConstants;
 import com.mpodda.thymeleaf_sample.web.PagingAndSortingService;
 
 import jakarta.servlet.http.HttpSession;
+
 @Aspect
 @Component
 public class SessionalAspectService <Dto extends BaseDto> {
@@ -53,17 +54,20 @@ public class SessionalAspectService <Dto extends BaseDto> {
 	
 	@SuppressWarnings({"unchecked", "null"})
 	@After ("anyPageControllerExecution()  && args(model, httpSession,..)")
-	public /*<Dto extends BaseDto>*/ void afterPageControllerExecution(JoinPoint joinPoint, Model model, HttpSession httpSession) {
+	public void afterPageControllerExecution(JoinPoint joinPoint, Model model, HttpSession httpSession) {
 		final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-
+		
+		/* Is 'Sessional' Controller Method */
 		final boolean isSessionalMethod = (methodSignature.getMethod().getAnnotation(SessionalMethod.class) != null);
 		
 		if (isSessionalMethod) {
 			final String[] sessionAttributeNames = methodSignature.getMethod().getAnnotation(SessionalMethod.class).sessionAttributeNames();
 			
-			Map<String, List<Dto>> map = new HashMap<String, List<Dto>>();
+			/* Map that be stored in this session */
+			Map<String, List<Dto>> sessionMap = new HashMap<String, List<Dto>>();
 			
-			Map<String, PagingAndSortingDto> map2 = (Map<String, PagingAndSortingDto>)model.getAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value());
+			/* Map that should be stored in this Model */
+			Map<String, PagingAndSortingDto> modelMap = (Map<String, PagingAndSortingDto>)model.getAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value());
 		
 			LOGGER.info("Try to get Session from repository with id: {}", httpSession.getId());
 			
@@ -73,46 +77,44 @@ public class SessionalAspectService <Dto extends BaseDto> {
 				session = this.sessionRepository.createSession();
 				LOGGER.info("No session found. New one created with id: {}", session.getId());
 				
-				//TODO: Improve later if Spring Security is introduced. Find other sessions in repository by principal and delete them.
+				//TODO: Improve later when Spring Security is introduced. Find other sessions in repository by principal and delete them.
 			}
 			
 			for (int i=0; i<methodSignature.getDeclaringType().getMethods().length; i++) {
 				final boolean isSessionalDtoMethod = methodSignature.getDeclaringType().getMethods()[i].getAnnotation(SessionalDto.class) != null;
 				
+				/* Method is 'Sessional' Dto method (Usually 'getter') */
 				if (isSessionalDtoMethod) {
+					/* Session Attribute Name */
 					final String sessionAttributeName = methodSignature.getDeclaringType().getMethods()[i].getAnnotation(SessionalDto.class).sessionAttributeName();
+					
+					/* Attribute belongs to given 'Sessional' method */
 					final boolean isSessionalAttributeOfThisSessionalMethod = Arrays.stream(sessionAttributeNames).anyMatch(s -> s.equals(sessionAttributeName));					
 					
 					if (isSessionalAttributeOfThisSessionalMethod) {
-						Method method = methodSignature.getDeclaringType().getMethods()[i];
+						final Method method = methodSignature.getDeclaringType().getMethods()[i];
 						
 						try {
+							/* Get Data */
 							List<Dto> data = (List<Dto>)method.invoke(joinPoint.getTarget());
 							
+							/* Are data should be paged ? */
 							final boolean paging = methodSignature.getDeclaringType().getMethods()[i].getAnnotation(SessionalDto.class).paging();
 							
+							/* Paging case */
 							if (paging) {
-								/*
-								PagingAndSortingDto pagingAndSortingDto = (PagingAndSortingDto)model.getAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value());
-								pagingAndSortingDto = this.pagingAndSortingService.pagingSetup(pagingAndSortingDto, data);
-								
-								model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), pagingAndSortingDto);
-								model.addAttribute(sessionAttributeName, pagingAndSortingDto.getPageData());
-
-								System.out.println(String.format("%s Total Pages", pagingAndSortingDto.getNumberOfPages()));
-								*/
-								
 								PagingAndSortingDto pagingAndSortingDto = new PagingAndSortingDto();
 								pagingAndSortingDto = this.pagingAndSortingService.pagingSetup(pagingAndSortingDto, data);
-								map2.put(sessionAttributeName, pagingAndSortingDto);
-								model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), map2);
+								modelMap.put(sessionAttributeName, pagingAndSortingDto);
+								model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), modelMap);
 								
 								model.addAttribute(sessionAttributeName, pagingAndSortingDto.getPageData());
 							} else {
+								/* No Paging case */
 								model.addAttribute(sessionAttributeName, data);	
 							}
 							
-							map.put(sessionAttributeName, data);
+							sessionMap.put(sessionAttributeName, data);
 						} catch (IllegalAccessException e) {
 							e.printStackTrace();
 						} catch (InvocationTargetException e) {
@@ -122,8 +124,8 @@ public class SessionalAspectService <Dto extends BaseDto> {
 				}
 			}
 			
-			if (!map.isEmpty()) {
-				session.setAttribute(SessionalConstants.DATA.value(), map);
+			if (!sessionMap.isEmpty()) {
+				session.setAttribute(SessionalConstants.DATA.value(), sessionMap);
 				this.sessionRepository.save(session);
 			}
 		}

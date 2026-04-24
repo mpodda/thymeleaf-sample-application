@@ -14,7 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import com.mpodda.thymeleaf_sample.config.WebConfiguration;
+
 import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingAndSortingDto;
 import com.mpodda.thymeleaf_sample.domain.enums.PagingAndSortingConstants;
@@ -25,10 +25,7 @@ import com.mpodda.thymeleaf_sample.web.PagingAndSortingService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-//@SessionAttributes({"pagingAndSortingDto", "data"})
-public class SortingController<Dto extends BaseDto> {
-
-    private final WebConfiguration webConfiguration;
+public class PagingAndSortingController<Dto extends BaseDto> {
 
 	@SuppressWarnings("rawtypes")
 	@Autowired
@@ -40,16 +37,12 @@ public class SortingController<Dto extends BaseDto> {
 	@Value("${tsa.page-size}")
 	private int pageSize;
 
-    SortingController(WebConfiguration webConfiguration) {
-        this.webConfiguration = webConfiguration;
-    } 
-	
 	@SuppressWarnings({"unchecked", "null"})
-	@PostMapping("/sort")
+	@PostMapping("/paging-sort")
 	public String sort(Model model, @ModelAttribute PagingAndSortingDto pagingAndSortingDto, HttpSession httpSession) {
-		System.out.println(String.format("sort :: pagingAndSortingDto: %s", Serializer.objectToJsonString(pagingAndSortingDto)));
+//		System.out.println(String.format("sort :: pagingAndSortingDto: %s", Serializer.objectToJsonString(pagingAndSortingDto)));
 		
-		Map<String, PagingAndSortingDto> map = new HashMap<String, PagingAndSortingDto>(); 
+		Map<String, PagingAndSortingDto> modelMap = new HashMap<String, PagingAndSortingDto>(); 
 		
 		pagingAndSortingDto = defineSortingDirection(pagingAndSortingDto);
 		
@@ -60,7 +53,7 @@ public class SortingController<Dto extends BaseDto> {
 		Session session = this.sessionRepository.findById(httpSession.getId());
 		
 		if (session != null && session.getAttribute(SessionalConstants.DATA.value()) != null) {
-			Map<String, List<Dto>> map2 = (Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value());
+			Map<String, List<Dto>> sessionMap = (Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value());
 			List<Dto> data = ((Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value())).get(pagingAndSortingDto.getSessionAttribute());
 			
 			PagedListHolder<Dto> pagedListHolder = new PagedListHolder<Dto>(data);
@@ -86,26 +79,23 @@ public class SortingController<Dto extends BaseDto> {
 			pagedListHolder.resort();
 			
 			pagedListHolder.setPageSize(this.pageSize);
-			//pagedListHolder.setPage(PagingAndSortingConstants.DEFAULT_PAGE.intValue());
 			pagedListHolder.setPage(pagingAndSortingDto.getPageNumber() == null ? PagingAndSortingConstants.DEFAULT_PAGE.intValue() : pagingAndSortingDto.getPageNumber() - 1);
-			
 			
 			pagingAndSortingDto = this.pagingAndSortingService.updatePagingData(pagingAndSortingDto, pagedListHolder);
 			
 			model.addAttribute(pagingAndSortingDto.getSessionAttribute(), pagedListHolder.getPageList());
 			
-			map.put(pagingAndSortingDto.getSessionAttribute(), pagingAndSortingDto);
+			modelMap.put(pagingAndSortingDto.getSessionAttribute(), pagingAndSortingDto);
 			
 			final String sessionAttribute = pagingAndSortingDto.getSessionAttribute();
 			
-			map2.keySet().forEach(key-> {
+			sessionMap.keySet().forEach(key-> {
 				if (!key.equals(sessionAttribute)) {
-					map.put(key, new PagingAndSortingDto());
+					modelMap.put(key, new PagingAndSortingDto());
 				}
 			});
 			
-			model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), map);
-			
+			model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), modelMap);
 		} else {
 			//TODO: Send an message to a REST end point. End point will transfer the message to via Web socket in order to "refresh" somehow the page in question to create session.
 			//TODO: Investigate later the above idea. ACHTUNG!!! Do not create infinite loop. If after message sending the code lands here again, raise error message to user and 
@@ -114,13 +104,15 @@ public class SortingController<Dto extends BaseDto> {
 		
 		//TODO: Use constant
 		//return new StringBuilder("application").append(pagingAndSortingDto.getViewName()).toString();
-		
 //		return new StringBuilder("application").append("/home2").toString();
 		
-		return new StringBuilder("application/fragments/").append(pagingAndSortingDto.getSessionAttribute()).append("-fragments :: ").append(pagingAndSortingDto.getSessionAttribute()).append("-list").toString();
+		//return new StringBuilder("application/fragments/").append(pagingAndSortingDto.getSessionAttribute()).append("-fragments :: ").append(pagingAndSortingDto.getSessionAttribute()).append("-list").toString();
 		
+		
+		//return new StringBuilder("application/fragments/persons-fragments3 :: persons-list").toString();
+		
+		return pagingAndSortingDto.getFragmentUrl();
 	}
-
 	
 	private static PagingAndSortingDto defineSortingDirection(PagingAndSortingDto sortingDto) {
 		if (sortingDto.getCurrentSortDirection() == "") {

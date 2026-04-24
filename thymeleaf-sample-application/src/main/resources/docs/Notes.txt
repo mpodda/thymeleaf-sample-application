@@ -141,4 +141,37 @@
 		
 		
 		<th:block th:fragment="grid" layout:fragment="grid-fragment(sessionAttribute)" th:with="randomSuffix=${randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${randomSuffix}, paging = (${paging} == null ? true : ${paging})">
+
+		
+		<p>Context: <pre th:text="${#ctx['LayoutDialect::FragmentCollection']['content']}"></pre> </p>
+		
+		
+	<p>Context[randomSuffix]: <pre th:text="${#ctx['randomSuffix']}"></pre> </p>
+	<p>Context[content]: <pre th:text="${#ctx['content']}"></pre> </p>
+
+		
+		
+		<p>Context: <pre th:text="${#strings.substringAfter(#ctx, '[StandardHTMLInliner]')}"></pre> </p>
+		
+		
+==========================================
+
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.web.servlet.JakartaServletWebApplication;
+import org.thymeleaf.web.servlet.JakartaServletWebExchange;
+
+
+public String render(HttpServletRequest request,
+                     HttpServletResponse response) {
+
+    var application = JakartaServletWebApplication.buildApplication(request.getServletContext());
+    var exchange = new JakartaServletWebExchange(request, response, application);
+
+    WebContext context = new WebContext(exchange);
+    context.setVariable("name", "John");
+
+    return templateEngine.process("template", context);
+}
+
+=======================================================		
 		

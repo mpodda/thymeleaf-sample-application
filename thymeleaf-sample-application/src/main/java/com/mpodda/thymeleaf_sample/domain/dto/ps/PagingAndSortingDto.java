@@ -8,6 +8,8 @@ import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 public class PagingAndSortingDto extends BaseDto implements Serializable {
 	private static final long serialVersionUID = -8711706368363317655L;
 	
+	private String fragmentUrl;
+	
 	/* Paging */
 	private Integer pageOffset;
 	
@@ -159,5 +161,13 @@ public class PagingAndSortingDto extends BaseDto implements Serializable {
 
 	public void setLastPageNumbers(List<Integer> lastPageNumbers) {
 		this.lastPageNumbers = lastPageNumbers;
+	}
+
+	public String getFragmentUrl() {
+		return fragmentUrl;
+	}
+
+	public void setFragmentUrl(String fragmentUrl) {
+		this.fragmentUrl = fragmentUrl;
 	}
 }

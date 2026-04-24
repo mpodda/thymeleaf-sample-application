@@ -259,6 +259,8 @@ class GridComponent {
 //		for (const paginator of paginators) {
 //			await initPaging(paginator);
 //		}
+
+		console.info("hash=", window.location);
 	}
 	
 	await init();

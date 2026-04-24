@@ -8,16 +8,15 @@
 <body>
 
 	<th:block th:fragment="persons-list">
-
-		<section layout:replace="~{application/components/table-components2 :: grid-fragment(sessionAttribute = 'persons')}">
-		
-			<table class="table table-hover" layout:fragment="grid-content">
+		<section th:insert="~{application/components/table-components :: grid-fragment(sessionAttribute = 'persons', gridContent= ~{::gridContent})}">
+			
+			<table class="table table-hover" th:fragment="gridContent">
 				<thead>
 					<tr>
-						<th th:replace="~{application/components/table-components2 :: column-header('Id','id')}"></th>
-						<th th:replace="~{application/components/table-components2 :: column-header('Name', 'name')}"></th>
-						<th th:replace="~{application/components/table-components2 :: column-header('Age','age')}"></th>
-						<th th:replace="~{application/components/table-components2 :: column-header('Date of Birth', 'dateOfBirth')}"></th>
+						<th th:replace="~{application/components/table-components :: column-header('Id','id')}"></th>
+						<th th:replace="~{application/components/table-components :: column-header('Name', 'name')}"></th>
+						<th th:replace="~{application/components/table-components :: column-header('Age','age')}"></th>
+						<th th:replace="~{application/components/table-components :: column-header('Date of Birth', 'dateOfBirth')}"></th>
 						<th></th>
 					</tr>
 				</thead>

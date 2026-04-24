@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content, page_scripts)">
 
 <head>
 	<meta charset="utf-8" />
@@ -23,6 +23,8 @@
                 "[[@{/}]]".indexOf(";jsessionid"));
         const token = '';
     </script>
+    
+    <title>Layout 3</title>
 </head>
 
 
@@ -32,7 +34,7 @@
 	<!-- / Menu -->
 
 	<!-- Content -->
-	<section class="section" layout:fragment="content"></section>
+	<section class="section" th:replace="${content}"></section>
 	<!-- / Content -->
 
 	<script th:src="@{/layouts/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js}" type="text/javascript"></script>
@@ -40,7 +42,7 @@
 	<script th:src="@{/js/application/pagingAndSorting.js}" type="module"></script>
 	
 	<!-- Page Scripts -->
-	<th:block layout:fragment="page-scripts"></th:block>
+	<th:block th:replace="${page_scripts}"></th:block>
 	<!-- / Page Scripts -->
 </body>
 </html>

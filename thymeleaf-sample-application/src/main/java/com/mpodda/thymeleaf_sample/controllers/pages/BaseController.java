@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-//@SessionAttributes({"data", "pagingAndSortingDto"})
 public class BaseController {
 
 	@ModelAttribute("currentUrl")
@@ -21,16 +20,9 @@ public class BaseController {
 	    return request.getRequestURI();
 	}
 	
-//	@ModelAttribute("pagingAndSortingDto")
-//	public PagingAndSortingDto getPagingAndSortingDto() {
-//		System.out.println("Instaciate pagingAndSortingDto");
-//		return new PagingAndSortingDto();
-//	}
-	
 	@ModelAttribute("pagingAndSortingDto")
 	public Map<String, PagingAndSortingDto> getPagingAndSortingDto() {
 		System.out.println("Instatiate pagingAndSortingDto Map");
 		return new HashMap<String, PagingAndSortingDto>();
 	}
-	
 }

@@ -163,8 +163,6 @@ public final class PagingAndSortingService<Dto extends BaseDto> {
 			pageNumbers = allPageNumbers.subList(firstPageNumberPosition, lastPageNumberPosition + 1);
 		}
 		
-		System.out.println(String.format("Current Page Number: %s", pagingAndSortingDto.getPageNumber()));
-		
 		pageNumbers.forEach(pageNumber -> {
 			pageNumbersList.add (
 				new PageNumberDto(pageNumber)
@@ -175,54 +173,6 @@ public final class PagingAndSortingService<Dto extends BaseDto> {
 			);
 		});
 		
-		System.out.println(String.format("pageNumbers: %s", pageNumbers));
-		
-		System.out.println(String.format("Current Page: %s", pageNumbersList.stream().filter(pgNrDto -> pgNrDto.isCurrentPage()).findFirst())); 
-		
-		
 		return pageNumbersList;
 	}
-	
-	/*
-	private static List<PageNumberDto> definePageNumbers(PagingAndSortingDto pagingAndSortingDto, final int maxNumberOfPages) {
-		List<PageNumberDto> pageNumbersList = new ArrayList<PageNumberDto>(maxNumberOfPages);
-		
-		final int[] pageNumberRange = definePageNumberRange(pagingAndSortingDto, maxNumberOfPages);
-		for (int pageNumber = pageNumberRange[0]; pageNumber <= pageNumberRange[1]; pageNumber++) {
-			pageNumbersList.add(new PageNumberDto(pageNumber).currentPage(pageNumber == pagingAndSortingDto.getPageNumber()));
-		}
-		
-		return pageNumbersList;
-	}
-	*/
-	
-	/*
-	private static int[] definePageNumberRange(final PagingAndSortingDto pagingAndSortingDto, final int maxNumberOfPages) {
-		int[] returnValues = {1, pagingAndSortingDto.getNumberOfPages()};
-		
-		if (pagingAndSortingDto.getNumberOfPages() <= maxNumberOfPages) {
-			return returnValues;
-		}
-		
-		final int halfNumberOfPages = (maxNumberOfPages / 2);
-		
-		int startPageNumber = (pagingAndSortingDto.getPageNumber() - halfNumberOfPages);
-		
-		if (startPageNumber <= 0) {
-			startPageNumber = 1;
-		}
-		
-		int endPageNumber = (startPageNumber + maxNumberOfPages - 1);
-		
-		if (endPageNumber > pagingAndSortingDto.getNumberOfPages()) {
-			startPageNumber = (pagingAndSortingDto.getNumberOfPages() - maxNumberOfPages) + 1;
-			endPageNumber = pagingAndSortingDto.getNumberOfPages();
-		}
-		
-		returnValues[0] = startPageNumber;
-		returnValues[1] = endPageNumber;
-		
-		return returnValues;
-	}
-	*/
 }
