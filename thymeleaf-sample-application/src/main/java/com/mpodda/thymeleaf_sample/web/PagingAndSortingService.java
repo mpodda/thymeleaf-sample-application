@@ -42,6 +42,8 @@ public final class PagingAndSortingService<Dto extends BaseDto> {
 		pagingAndSortingDto.setFirstPageNumbers(firstPageNumbers(this.numberOfLimitsPages, pagingAndSortingDto.getNumberOfPages(), pagingAndSortingDto.getPageNumbers()));
 		pagingAndSortingDto.setLastPageNumbers(lastPageNumbers(this.numberOfLimitsPages, pagingAndSortingDto.getNumberOfPages(), pagingAndSortingDto.getPageNumbers()));
 		
+		pagingAndSortingDto.setNumberOfRecords(data.size());
+		
 		return pagingAndSortingDto;
 	}
 	

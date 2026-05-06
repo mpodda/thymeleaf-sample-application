@@ -10,6 +10,8 @@ public class PagingAndSortingDto extends BaseDto implements Serializable {
 	
 	private String fragmentUrl;
 	
+	private Integer numberOfRecords;
+	
 	/* Paging */
 	private Integer pageOffset;
 	
@@ -169,5 +171,13 @@ public class PagingAndSortingDto extends BaseDto implements Serializable {
 
 	public void setFragmentUrl(String fragmentUrl) {
 		this.fragmentUrl = fragmentUrl;
+	}
+
+	public Integer getNumberOfRecords() {
+		return numberOfRecords;
+	}
+
+	public void setNumberOfRecords(Integer numberOfRecords) {
+		this.numberOfRecords = numberOfRecords;
 	}
 }

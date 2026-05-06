@@ -113,32 +113,21 @@ export function createNodeFromText(text) {
 	return document.importNode(fragmentText, true);
 }
 
+
 /*
- export function onDataChange() {
-	console.info("Module onDataChange");
-//	dd();
- };
+  -----------------------
+  -- Intecommunication -- 
+  -----------------------
 */
 
- //export function dd(){}
- 
-
-class Ddd {
-	
-	constructor() {
-		this.ddw = () => {};
-	}
-}
-
-export let dd = new Ddd();
-
-
-class Intecommunication {
+export class Intecommunication {
 	constructor() {
 		this.onDataChange = async () => {};
+		
+		this.onDataChange = async (data) => {};
 	}
-	
 }
 
 
 export let intecommunication = new Intecommunication();
+

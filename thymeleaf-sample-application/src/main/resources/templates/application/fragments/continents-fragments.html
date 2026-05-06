@@ -7,28 +7,40 @@
 </head>
 <body>
 	<th:block th:fragment="continents-list">
-		<section th:insert="~{application/components/table-components :: grid-fragment (sessionAttribute = 'continents', gridContent= ~{::gridContent})}">
+		<th:block th:insert="~{application/layouts/list-layout :: admin-data-list (sessionAttribute = 'continents', ref='continent', title='Continents', body = ~{::data-lst-body})}">
+			<th:block th:fragment="data-lst-body">
+				<section th:insert="~{application/components/table-components :: grid-fragment (sessionAttribute = 'continents', gridContent = ~{::gridContent})}">
+					<table class="table table-hover" th:fragment="gridContent">
+						<thead>
+							<tr>
+								<th th:replace="~{application/components/table-components :: column-header('Id', 'id')}"></th>
+								<th th:replace="~{application/components/table-components :: column-header('Name', 'name')}"></th>
+								<th></th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							<tr th:each="record : ${continents}">
+								<td th:text="${record.id}"></td>
+								<td th:text="${record.name}"></td>
+								<td><button class="btn btn-light" role="edit-continent" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+			</th:block>
+		</th:block>
+	</th:block>
+	
+	<th:block th:fragment="edit-continent">
+		<form action="#" id="editContinentForm" th:object="${continent}">
+			<section th:insert="~{application/layouts/admin-form-layout :: admin-form-layout(content = ~{::form-content}, object=${continent})}">
 		
-			<table class="table table-hover" th:fragment="gridContent">
-				<thead>
-					<tr>
-						<th th:replace="~{application/components/table-components :: column-header('Id', 'id')}"></th>
-						<th th:replace="~{application/components/table-components :: column-header('Name', 'name')}"></th>
-						<th></th>
-					</tr>
-				</thead>
-				
-				<tbody>
-					<tr th:each="record : ${continents}">
-						<td th:text="${record.id}"></td>
-						<td th:text="${record.name}"></td>
-						<td><button class="btn btn-light" role="edit-continent" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
-					</tr>
-				</tbody>
-			</table>
-			
-		</section>
-		
+				<div class="row" th:fragment="form-content">
+					<th:block th:insert="~{application/components/form-components :: text (label='Name', name='name', value=${continent.name})}"></th:block>
+				</div>
+			</section>
+		</form>
 	</th:block>
 </body>
 </html>

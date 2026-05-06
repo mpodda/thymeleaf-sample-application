@@ -1,0 +1,13 @@
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-form-layout(content)">
+<body>
+	<section role="placeholder">
+		<section th:replace="${content}"></section>
+		
+		
+		<div class="row">
+			<div class="col"><button type="button" class="btn btn-primary" id="btnSave">OK</button></div>
+			<div class="col"><button type="button" class="btn" id="btnCancel">Cancel</button></div>
+		</div>
+	</section>
+</body>
+</html>

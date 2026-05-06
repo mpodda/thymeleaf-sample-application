@@ -1,83 +1,61 @@
-//import * as app from './thysa-application.js';
+//import {intecommunication as app_itercom} from './thysa-application.js';
 
-//import {dd as app_dd} from './thysa-application.js';
-
-import {intecommunication as app_itercom} from './thysa-application.js';
+import {ContinentsAdmin as ContinentsAdmin} from './ContinentsAdmin.js';
+import {PersonsAdmin as PersonsAdmin} from './PersonsAdmin.js';
 
 (async () => {
-	let intercom = app_itercom;
+//	let intercom = app_itercom;
 	
-	intercom.onDataChange = async() => {
-		const editCondinentButtons = document.querySelectorAll('[role="edit-continent"]');
+//	async function initGridEvents() {
+//		/* Edit Continents */
+//		const editCondinentButtons = document.querySelectorAll('[role="edit-continent"]');
+//
+//		for (const editCondinentButton of editCondinentButtons) {
+//			editCondinentButton.addEventListener("click", async () => {
+//				const condinentId = editCondinentButton.getAttribute("data-id");
+//
+//				console.info("Edit Continent with id", condinentId);				
+//			});
+//		}	
 
-		for (const editCondinentButton of editCondinentButtons) {
-			editCondinentButton.addEventListener("click", async () => {
-				const condinentId = editCondinentButton.getAttribute("data-id");
-				
-				console.info(`Edit condinent with id ${condinentId}`);
-			});
-		}	
-		
-		const editPersonButtons = document.querySelectorAll('[role="edit-person"]');
-
-		for (const editPersonButton of editPersonButtons) {
-			editPersonButton.addEventListener("click", async () => {
-				const personId = editPersonButton.getAttribute("data-id");
-				
-				console.info(`Edit person with id ${personId}`);
-			});
-		}
-	}
+//		const editPersonButtons = document.querySelectorAll('[role="edit-person"]');
+//
+//		for (const editPersonButton of editPersonButtons) {
+//			editPersonButton.addEventListener("click", async () => {
+//				const personId = editPersonButton.getAttribute("data-id");
+//				
+//				console.info(`Edit person with id ${personId}`);
+//			});
+//		}		
+//	} 
 	
-	/*
-	let dd = app_dd;
+//	async function initEvents() {
+//		await ContinentsAdmin.getInstance();
+//		
+//		await PersonsAdmin.getInstance();
+//		
+//		/* Add Continent */
+////		console.info(document.querySelectorAll('[role="add-continent"]').length, "add continent buttons found");
+//		
+////		const addContinentButton = document.querySelectorAll('[role="add-continent"]')[0];
+////		addContinentButton.addEventListener("click", async () => {
+////			console.info("Add Continent");
+////		});
+//		
+//		//await initGridEvents();
+//		
+//		 
+//	} 
 	
-	dd.ddw = () => {
-		console.info("home onDataChange");
-		
-		const editCondinentButtons = document.querySelectorAll('[role="edit-continent"]');
-
-		for (const editCondinentButton of editCondinentButtons) {
-			editCondinentButton.addEventListener("click", async () => {
-				const condinentId = editCondinentButton.getAttribute("data-id");
-				
-				console.info(`Edit condinent with id ${condinentId}`);
-			});
-		}		
-	}
-	*/
-	
-
+//	intercom.onDataChange = async() => {
+//		await initGridEvents();
+//	}
 
 	async function init() {
-		//console.info("Init home!");
-		
-		/*
-		document.querySelector("#btnModel").addEventListener("click", async () => {
-			console.info("Submit Model");
-			
-			app.getSync("/model");
-		});
-		*/
-		const editCondinentButtons = document.querySelectorAll('[role="edit-continent"]');
-		
-		for (const editCondinentButton of editCondinentButtons) {
-			editCondinentButton.addEventListener("click", async () => {
-				const condinentId = editCondinentButton.getAttribute("data-id");
-				
-				console.info(`Edit condinent with id ${condinentId}`);
-			});
-		}
-		
-		const editPersonButtons = document.querySelectorAll('[role="edit-person"]');
+//		await initEvents();
 
-		for (const editPersonButton of editPersonButtons) {
-			editPersonButton.addEventListener("click", async () => {
-				const condinentId = editPersonButton.getAttribute("data-id");
-				
-				console.info(`Edit person with id ${condinentId}`);
-			});
-		}		
+		await ContinentsAdmin.getInstance();
+		await PersonsAdmin.getInstance();
 	}
 	
 	await init();

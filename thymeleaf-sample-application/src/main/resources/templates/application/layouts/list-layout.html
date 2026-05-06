@@ -1,0 +1,19 @@
+<html xmlns:th="http://www.thymeleaf.org">
+	<body>
+		<th:block th:with="header='', title = ${title}, footer=${pagingAndSortingDto.get(sessionAttribute).numberOfRecords} + ' Records'" th:fragment="admin-data-list(sessionAttribute, ref, body)">
+			<div class="card text-center" role="placeholder">
+				<div class="card-header">
+					<div class="clearfix">
+						<span th:text="${header}" style="font-weight:bold;"></span>
+						<span><button class="btn btn-secondary col-md-1 float-md-end" style="width:3.0rem;" th:role="'add-' + ${ref}"><i class="fa-solid fa-plus"></i></button></span>
+					</div>
+				</div>
+				<div class="card-body">
+					<h5 class="card-title" th:text="${title}"></h5>
+					<th:block th:replace="${body}"></th:block>
+				</div>
+				<div class="card-footer text-body-secondary" style="font-weight:bold;" th:text="${footer}"></div>
+			</div>
+		</th:block>
+	</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>.</title>
+</head>
+<body>
+	<!-- Text -->
+		<th:block th:fragment="text (label, name, value)" th:with="oneRow = ${oneRow}, readOnly = ${readOnly}">
+			<div class="col"><label th:for="${name}" class="form-label" th:text="${label} + ': '"></label></div>
+			<div class="col"><input type="text" class="form-control" th:placeholder="${label}" th:value="${value}"></div>
+		</th:block>
+	<!-- / Text -->
+</body>
+</html>

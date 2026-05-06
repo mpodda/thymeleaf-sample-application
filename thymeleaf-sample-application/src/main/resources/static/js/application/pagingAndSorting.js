@@ -61,7 +61,9 @@ class GridComponent {
 		this.#grid.getElementsByTagName('table')[0].removeChild(tBody);
 		this.#grid.getElementsByTagName('table')[0].appendChild(newTBody);
 		
-		await this.#app.intecommunication.onDataChange();
+		//console.info(" #updateSortedContent: onDataChange();")
+		console.info("sessionAttribute=", this.#form.sessionAttribute.value);
+		await this.#app.intecommunication.onDataChange(this.#form.sessionAttribute.value);
 	}
 	
 	async #sort(field) {
@@ -126,8 +128,6 @@ class GridComponent {
 		await this.#applyPagingEvents();
 	}
 	
-
-	
 	async #updatePagedContent(httpRequest) {
 		let nav = this.#paginator.getElementsByTagName('nav')[0];
 		
@@ -161,106 +161,53 @@ class GridComponent {
 }
 
 (async () => {
-	//let gridComponents = null;
-	let paginators = null;
+//	async function applySortEvents(sortForm, header, gridComponent) {
+//		let headers = header.querySelectorAll("th");
+//		
+//		for (const header of headers) {
+//			header.addEventListener("click", async () => {
+//				sort(sortForm, header.getAttribute("sort-field"), gridComponent);
+//			});
+//		}		
+//	}
 	
-	let randomSuffixes = [];
-	
-	async function initPaging(paginator) {
-
-				
-	}
-	
-	 
-	function paginatorRandomSuffix(paginator) {
-		return paginator.querySelectorAll('[role="grid-paging"]')[0].getAttribute("random-suffix");
-	}
-
-	async function applySortEvents(sortForm, header, gridComponent) {
-		let headers = header.querySelectorAll("th");
-		
-		for (const header of headers) {
-			header.addEventListener("click", async () => {
-				sort(sortForm, header.getAttribute("sort-field"), gridComponent);
-			});
-		}		
-	}
-	
-	async function sort(form, field, grid) {
-		form.currentSortField.value = field;
-		const httpRequest = await app.postFormSync(form, form.getAttribute("action"));
-		
-//		console.info("Response: ", httpRequest.responseText);
-		
-		//TODO: Improve later
-		//await app.setContent (httpRequest.responseText, gridComponent);
-//		const contentPlaceHolder = gridComponent.querySelectorAll('[role="grid-content"]')[0];
-		
-		/* Header handling */
-		const header = grid.getElementsByTagName('thead')[0];
-		const newHeader = app.createHTMLFragmentFromTag(httpRequest.responseText, 'thead');
-		await applySortEvents(form, newHeader, grid);
-		grid.getElementsByTagName('table')[0].replaceChild(newHeader, header);
-		
-		/* Content handling */
-		let tBody = grid.getElementsByTagName('tbody')[0];
-		
-		const newTBody = app.createHTMLFragmentFromTag(httpRequest.responseText, 'tbody');
-		
-		document.importNode(newTBody);
-		
-		grid.getElementsByTagName('table')[0].removeChild(tBody);
-		grid.getElementsByTagName('table')[0].appendChild(newTBody);
-		
-		/* Paging handling */
-		//TODO: Later
-		
-		/* Form handling */
-		const newForm = app.createHTMLFragmentFromTag(httpRequest.responseText, 'form');
-		form.currentSortDirection.value = newForm.currentSortDirection.value;
-		
-		await app.intecommunication.onDataChange();
-	}
-	
-	function gridComponentRandomSuffix(gridComponent) {
-		return gridComponent.querySelectorAll('[role="grid-content"]')[0].getAttribute("random-suffix");
-	}
-	
-	async function initSorting(grid) {
-		const sortFormCollector = `[grid-form-id="grid-form-${gridComponentRandomSuffix(grid)}"]`;
-		let sortForm = grid.querySelectorAll(sortFormCollector)[0];
-		
-		let headers = grid.querySelectorAll("th");
-
-		for (const header of headers) {
-			header.addEventListener("click", async () => {
-				sort(sortForm, header.getAttribute("sort-field"), grid);
-			});
-		}
-		
-		randomSuffixes.push(grid.querySelectorAll('[role="grid-content"]')[0].getAttribute("random-suffix"));
-	}
+//	async function sort(form, field, grid) {
+//		form.currentSortField.value = field;
+//		const httpRequest = await app.postFormSync(form, form.getAttribute("action"));
+//		
+//		/* Header handling */
+//		const header = grid.getElementsByTagName('thead')[0];
+//		const newHeader = app.createHTMLFragmentFromTag(httpRequest.responseText, 'thead');
+//		await applySortEvents(form, newHeader, grid);
+//		grid.getElementsByTagName('table')[0].replaceChild(newHeader, header);
+//		
+//		/* Content handling */
+//		let tBody = grid.getElementsByTagName('tbody')[0];
+//		
+//		const newTBody = app.createHTMLFragmentFromTag(httpRequest.responseText, 'tbody');
+//		
+//		document.importNode(newTBody);
+//		
+//		grid.getElementsByTagName('table')[0].removeChild(tBody);
+//		grid.getElementsByTagName('table')[0].appendChild(newTBody);
+//		
+//		/* Paging handling */
+//		//TODO: Later
+//		
+//		/* Form handling */
+//		const newForm = app.createHTMLFragmentFromTag(httpRequest.responseText, 'form');
+//		form.currentSortDirection.value = newForm.currentSortDirection.value;
+//		
+//		await app.intecommunication.onDataChange();
+//	}
 	
 	async function init() {
 		/* Grids */
 		let grids = document.querySelectorAll('[role="grid-component"]');
 		
 		for (const grid of grids) {
-//			await initSorting(grid);
-			
-			//console.info("random-suffix=", grid.querySelectorAll('[role="grid-content"]')[0].getAttribute("random-suffix"));
-			
 			await GridComponent.getInstance(grid, app);
 		}
-		
-//		/* Paginators */
-//		paginators = document.querySelectorAll('[role="grid-paging"]');
-//		
-//		for (const paginator of paginators) {
-//			await initPaging(paginator);
-//		}
-
-		console.info("hash=", window.location);
 	}
 	
 	await init();

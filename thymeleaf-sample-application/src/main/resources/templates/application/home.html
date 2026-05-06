@@ -1,20 +1,20 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{thysa-layout :: layout(~{::content}, ~{::page-scripts})}">
 
 <head>
+	<title></title>
 </head>
 	<section th:fragment="content">
 		<h2>This is home</h2>
-		
-		<section id="persons-list" style="width:100%;">
-			<th:block th:insert="~{application/fragments/persons-fragments :: persons-list}"></th:block>
-		</section>
-		
-		<hr />
 		
 		<section id="continets-list" style="width:100%;">
 			<th:block th:insert="~{application/fragments/continents-fragments :: continents-list}"></th:block>
 		</section>
 		
+		<hr />
+		
+		<section id="persons-list" style="width:100%;">
+			<th:block th:insert="~{application/fragments/persons-fragments :: persons-list}"></th:block>
+		</section>
 	</section>
 	
 	<th:block th:fragment="page-scripts">
