@@ -299,3 +299,16 @@ import * as app from './thysa-application.js';
 		</div>
 	</body>	
 </html>
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+const Status = Object.freeze({
+  ACTIVE: Symbol("ACTIVE"),
+  INACTIVE: Symbol("INACTIVE")
+});
+
+function isValidStatus(status) {
+  return Object.values(Status).includes(status);
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------

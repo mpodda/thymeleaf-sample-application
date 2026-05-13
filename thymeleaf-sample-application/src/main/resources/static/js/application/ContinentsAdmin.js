@@ -5,6 +5,7 @@ export class ContinentsAdmin extends AdminBase {
 		super();
 		
 		this.SessionAttribute = "continents";
+		this.AddValueUrl = "/new-continent";
 	}
 	
 	async initGridEvents() {

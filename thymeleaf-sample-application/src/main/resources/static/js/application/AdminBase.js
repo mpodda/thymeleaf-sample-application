@@ -1,5 +1,7 @@
 import {intecommunication as app_itercom} from './thysa-application.js';
 
+import {pushFragment as pushFragment} from './thysa-application.js';
+
 export class AdminBase {
 	static currentInstances = [];
 	
@@ -28,6 +30,8 @@ export class AdminBase {
 	
 	async addValue() {
 		console.info("Add value");
+		
+		pushFragment(this.#addValueUrl, this.#sessionAttribute);
 	}
 	
 	get SessionAttribute() {
@@ -38,27 +42,27 @@ export class AdminBase {
 		this.#sessionAttribute = value;
 	}
 
-	get addValueUrl() {
+	get AddValueUrl() {
 		return this.#addValueUrl;
 	}
 	
-	set addValueUrl(value) {
+	set AddValueUrl(value) {
 		this.#addValueUrl = value;
 	}
 	
-	get editValueUrl() {
+	get EditValueUrl() {
 		return this.#editValueUrl;
 	}
 	
-	set editValueUrl(value) {
+	set EditValueUrl(value) {
 		this.#editValueUrl = value;
 	}
 
-	get listValueUrl() {
+	get ListValueUrl() {
 		return this.#listValueUrl;
 	}
 	
-	set listValueUrl(value) {
+	set ListValueUrl(value) {
 		this.#listValueUrl = value;
 	}
 }

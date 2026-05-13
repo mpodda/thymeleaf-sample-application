@@ -1,13 +1,22 @@
-<html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-form-layout(content)">
-<body>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-form-layout(object, formContent)">
 	<section role="placeholder">
-		<section th:replace="${content}"></section>
-		
-		
-		<div class="row">
-			<div class="col"><button type="button" class="btn btn-primary" id="btnSave">OK</button></div>
-			<div class="col"><button type="button" class="btn" id="btnCancel">Cancel</button></div>
+		<div class="card text-center" role="form-card">
+			<div class="card-header">
+				<div class="clearfix"></div>
+			</div>
+			
+			<div class="card-body">
+				<form action="#" th:object="${object}" method="POST">
+					<section th:replace="${formContent}"></section>
+					
+					<div class="row">
+						<div class="col"><button type="button" class="btn btn-primary" id="btnSave">OK</button></div>
+						<div class="col"><button type="button" class="btn" id="btnCancel">Cancel</button></div>
+					</div>
+				</form>
+			</div>
+			
+			<div class="card-footer text-body-secondary" style="font-weight:bold;"></div>
 		</div>
 	</section>
-</body>
 </html>
