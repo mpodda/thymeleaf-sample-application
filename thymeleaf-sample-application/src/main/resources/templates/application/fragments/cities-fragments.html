@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>.</title>
+</head>
+<body>
+	<th:block th:fragment="cities-list">
+		<th:block th:insert="~{application/layouts/list-layout :: admin-data-list (sessionAttribute = 'cities', ref='city', title=#{cities.list.title}, body = ~{::data-list-body})}">
+			<th:block th:fragment="data-list-body">
+				<section th:insert="~{application/components/table-components :: grid-fragment (sessionAttribute = 'cities', gridContent = ~{::gridContent})}">
+					<table class="table table-hover" th:fragment="gridContent">
+						<thead>
+							<tr>
+								<th th:replace="~{application/components/table-components :: column-header('Name', 'name')}"></th>
+								<th></th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							<tr th:each="record : ${continents}">
+								<td th:text="${record.id}"></td>
+								<td th:text="${record.name}"></td>
+								<td><button class="btn btn-light" role="edit-continent" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+			</th:block>
+		</th:block>
+	</th:block>
+</body>
+</html>

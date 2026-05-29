@@ -1,17 +1,21 @@
-<html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-form-layout(object, formContent)">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-form-layout(object, formContent, sessionAttribute)" th:with="randomSuffix = ${#strings.randomAlphanumeric(5)}">
 	<section role="placeholder">
-		<div class="card text-center" role="form-card">
+		<div class="card text-center">
 			<div class="card-header">
 				<div class="clearfix"></div>
 			</div>
 			
 			<div class="card-body">
-				<form action="#" th:object="${object}" method="POST">
-					<section th:replace="${formContent}"></section>
+				<form action="#" th:object="${object}" method="POST" role="form">
+					<section th:role="form-content" th:form-content-id="${sessionAttribute}"><section th:replace="${formContent}"></section></section>
 					
-					<div class="row">
-						<div class="col"><button type="button" class="btn btn-primary" id="btnSave">OK</button></div>
-						<div class="col"><button type="button" class="btn" id="btnCancel">Cancel</button></div>
+					<div class="row" style="margin-top: 1.5rem;">
+						<div class="col-md-5">
+							<button type="button" class="btn btn-primary" id="btnSave">OK</button>
+						</div>
+						<div class="col-md-5">
+							<button type="button" class="btn btn-secondary" id="btnCancel">Cancel</button>
+						</div>
 					</div>
 				</form>
 			</div>

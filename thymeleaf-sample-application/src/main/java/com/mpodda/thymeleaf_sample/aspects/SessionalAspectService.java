@@ -23,6 +23,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
+import com.mpodda.thymeleaf_sample.controllers.pages.HomeController;
 import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingAndSortingDto;
 import com.mpodda.thymeleaf_sample.domain.enums.SessionalConstants;
@@ -33,6 +34,8 @@ import jakarta.servlet.http.HttpSession;
 @Aspect
 @Component
 public class SessionalAspectService <Dto extends BaseDto> {
+
+    private final HomeController homeController;
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionalAspectService.class);
 	
 	@Value("${tsa.page-size}")
@@ -45,6 +48,11 @@ public class SessionalAspectService <Dto extends BaseDto> {
 	
 	@Autowired
 	private PagingAndSortingService<Dto> pagingAndSortingService;
+
+
+    SessionalAspectService(HomeController homeController) {
+        this.homeController = homeController;
+    }
 	
 	
 	@Pointcut("within(com.mpodda.thymeleaf_sample.controllers.pages..*)")
@@ -64,7 +72,7 @@ public class SessionalAspectService <Dto extends BaseDto> {
 			final String[] sessionAttributeNames = methodSignature.getMethod().getAnnotation(SessionalMethod.class).sessionAttributeNames();
 			
 			/* Map that be stored in this session */
-			Map<String, List<Dto>> sessionMap = new HashMap<String, List<Dto>>();
+			Map<String, List<Dto>> sessionMap = null;
 			
 			/* Map that should be stored in this Model */
 			Map<String, PagingAndSortingDto> modelMap = (Map<String, PagingAndSortingDto>)model.getAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value());
@@ -77,7 +85,15 @@ public class SessionalAspectService <Dto extends BaseDto> {
 				session = this.sessionRepository.createSession();
 				LOGGER.info("No session found. New one created with id: {}", session.getId());
 				
+				sessionMap = new HashMap<String, List<Dto>>();
+				
 				//TODO: Improve later when Spring Security is introduced. Find other sessions in repository by principal and delete them.
+			} else {
+				sessionMap = (Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value());
+				
+				if (sessionMap == null) {
+					sessionMap = new HashMap<String, List<Dto>>();
+				}
 			}
 			
 			for (int i=0; i<methodSignature.getDeclaringType().getMethods().length; i++) {

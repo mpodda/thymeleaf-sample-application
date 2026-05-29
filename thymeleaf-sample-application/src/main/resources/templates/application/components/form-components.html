@@ -7,10 +7,27 @@
 </head>
 <body>
 	<!-- Text -->
-		<th:block th:fragment="text (label, name, value)" th:with="oneRow = ${oneRow}, readOnly = ${readOnly}">
-			<div class="col"><label th:for="${name}" class="form-label" th:text="${label} + ': '"></label></div>
-			<div class="col"><input type="text" class="form-control" th:placeholder="${label}" th:value="${value}"></div>
+		<th:block th:fragment="text (label, name, value)" th:with="readOnly = ${readOnly}, id=${name} + '_' + ${randomSuffix}">
+			<div class="col-md-1">
+				<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
+			</div>
+			<div class="col-md-3">
+				<input type="text" class="form-control" th:id="${id}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'" th:name="${name}" th:placeholder="${label}" th:value="${value}" />
+				
+				<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
+			</div>
 		</th:block>
 	<!-- / Text -->
+	
+	<!-- Hidden -->
+		<th:block th:fragment="hidden (name, value)">
+			<input type="hidden" th:name="${name}" th:value="${value}">
+		</th:block>
+	<!-- / Hidden -->
+	
+	<!-- Datalist -->
+		
+	<!-- ./ Datalist -->
+	
 </body>
 </html>

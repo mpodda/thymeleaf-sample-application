@@ -1,11 +1,9 @@
 import {ContinentsAdmin as ContinentsAdmin} from './ContinentsAdmin.js';
-import {PersonsAdmin as PersonsAdmin} from './PersonsAdmin.js';
 
 (async () => {
 
 		async function init() {
 		await ContinentsAdmin.getInstance();
-		await PersonsAdmin.getInstance();
 	}
 	
 	await init();

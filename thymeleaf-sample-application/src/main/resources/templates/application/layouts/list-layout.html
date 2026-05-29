@@ -1,6 +1,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 	<body>
-		<th:block th:with="header='', title = ${title}, footer=${pagingAndSortingDto.get(sessionAttribute).numberOfRecords} + ' Records'" th:fragment="admin-data-list(sessionAttribute, ref, body)">
+		<th:block th:with="header='', title = ${title}, footer=${pagingAndSortingDto.get(sessionAttribute).numberOfRecords} + ' ' + #{records}" th:fragment="admin-data-list(sessionAttribute, ref, body)">
 			<section role="placeholder" th:placeholder-id="${sessionAttribute}">
 					<div class="card text-center" role="list-card">
 						<div class="card-header">

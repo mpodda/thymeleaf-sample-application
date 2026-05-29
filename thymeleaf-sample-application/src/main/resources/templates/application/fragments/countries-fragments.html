@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>.</title>
+</head>
+<body>
+	<th:block th:fragment="countries-list">
+		<th:block th:insert="~{application/layouts/list-layout :: admin-data-list (sessionAttribute = 'countries', ref='country', title=#{coutries.list.title}, body = ~{::data-list-body})}">
+			<th:block th:fragment="data-list-body">
+				<section th:insert="~{application/components/table-components :: grid-fragment (sessionAttribute = 'countries', gridContent = ~{::gridContent})}">
+					<table class="table table-hover" th:fragment="gridContent">
+						<thead>
+							<tr>
+								<th th:replace="~{application/components/table-components :: column-header('Name', 'name')}"></th>
+								<th th:replace="~{application/components/table-components :: column-header('Continent', 'continent.name')}"></th>
+								<th></th>
+							</tr>
+						</thead>
+						
+						<tbody>
+							<tr th:each="record : ${countries}">
+								<td th:text="${record.id}"></td>
+								<td th:text="${record.name}"></td>
+								<td><button class="btn btn-light" role="edit-country" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+			</th:block>
+		</th:block>
+	</th:block>
+
+	<th:block th:fragment="edit-country">
+		<section th:replace="~{application/layouts/admin-form-layout :: admin-form-layout(object = ${country}, formContent = ~{::form-content}, sessionAttribute = 'countries')}">
+			<th:block th:fragment="form-content">
+				<div class="row">
+					<th:block th:insert="~{application/components/form-components :: text (label='Name', name='name', value=${country.name})}"></th:block>
+				</div>
+				
+				<th:block th:insert="~{application/components/form-components :: hidden (name='id', value=${country.id})}"></th:block>
+			</th:block>
+		</section>
+	</th:block>	
+</body>
+</html>

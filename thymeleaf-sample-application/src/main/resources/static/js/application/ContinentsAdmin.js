@@ -5,7 +5,11 @@ export class ContinentsAdmin extends AdminBase {
 		super();
 		
 		this.SessionAttribute = "continents";
+		
 		this.AddValueUrl = "/new-continent";
+		this.ListValueUrl = "/list-continents";
+		this.SaveValueUrl = "/save-continent";
+		this.EditValueUrl = "/edit-continent?continentId";
 	}
 	
 	async initGridEvents() {
@@ -15,8 +19,6 @@ export class ContinentsAdmin extends AdminBase {
 		for (const editCondinentButton of editCondinentButtons) {
 			editCondinentButton.addEventListener("click", async () => {
 				const condinentId = editCondinentButton.getAttribute("data-id");
-				
-				console.info("Continent: ");
 				await this.editValue(condinentId);
 			});
 		}
@@ -26,8 +28,6 @@ export class ContinentsAdmin extends AdminBase {
 		/* Add Continent */
 		const addContinentButton = document.querySelectorAll('[role="add-continent"]')[0];
 		addContinentButton.addEventListener("click", async () => {
-			
-			console.info("Continent: ");
 			await this.addValue();
 		});
 

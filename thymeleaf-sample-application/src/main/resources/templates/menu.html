@@ -1,4 +1,3 @@
-<!-- <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{thysa-layout.html}"> -->
 <html xmlns:th="http://www.thymeleaf.org">
     <head></head>
 
@@ -10,27 +9,27 @@
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <!-- Parameters -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Παράμετροι</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" th:text=#{menu.parameters}></a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Ήπηροι</a></li>
-                                <li><a class="dropdown-item" href="#">Χώρες</a></li>
-                                <li><a class="dropdown-item" href="#">Πόλεις</a></li>
+                                <li><a class="dropdown-item" th:href="@{/continents}" th:text=#{menu.continents}></a></li>
+                                <li><a class="dropdown-item" th:href="@{/countries}" th:text=#{menu.countries}></a></li>
+                                <li><a class="dropdown-item" href="#" th:text=#{menu.cities}></a></li>
                             </ul>
                         </li>
                         <!-- Parameters -->
                     
                         <!-- Admin Persons -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Διαχείριση</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" th:text=#{menu.administration}></a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Άτομα</a></li>
+                                <li><a class="dropdown-item" href="#" th:text=#{menu.persons}></a></li>
                             </ul>
                         </li>
                         <!-- / Admin Persons -->
 
                         <!-- Search -->
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Αναζήτηση</a>
+                            <a class="nav-link active" aria-current="page" href="#" th:text=#{menu.search}></a>
                         </li>
                         <!-- / Search -->
                     </ul>

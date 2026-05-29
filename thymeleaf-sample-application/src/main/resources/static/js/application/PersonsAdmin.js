@@ -4,6 +4,8 @@ export class PersonsAdmin extends AdminBase {
 	constructor () {
 		super();
 		
+		this.AddValueUrl = "/new-person";
+		this.ListValueUrl = "/list-persons";
 		this.SessionAttribute = "persons";
 	}
 	

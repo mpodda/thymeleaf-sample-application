@@ -1,27 +1,37 @@
 package com.mpodda.thymeleaf_sample.controllers.pages;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.ContinentDto;
 import com.mpodda.thymeleaf_sample.domain.dto.PersonDto;
-import com.mpodda.thymeleaf_sample.domain.entities.Continent;
+import com.mpodda.thymeleaf_sample.service.ContinentService;
 import com.mpodda.thymeleaf_sample.utils.RandomDateGenerator;
 
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class HomeController extends BaseController {
+	private ContinentService continentService;
+	
 	private List<ContinentDto> continentsList;
 	
 	private List<PersonDto> personsList;
+	
+	public HomeController(ContinentService continentService) {
+		this.continentService = continentService;
+	}
 
+	@Override
+	protected void addValidators(WebDataBinder binder) {
+		
+	}
 	
 	@SessionalDto(sessionAttributeName = "continents")
 	public List<ContinentDto> getContinentsList() {
@@ -36,13 +46,15 @@ public class HomeController extends BaseController {
 	@SessionalMethod(sessionAttributeNames = {"continents", "persons"})
 	@GetMapping({"/home"})
     public String home(Model model, HttpSession httpSession) {
-		this.continentsList = this.loadContinents();
+		//this.continentsList = loadContinents();
+		this.continentsList = this.continentService.allDto();
 		
-		this.personsList = this.loadPersons();		
+		this.personsList = loadPersons();		
 		return "application/home";
 	}
 
-	private List<ContinentDto> loadContinents() {
+	/*
+	public static List<ContinentDto> loadContinents() {
 		List<Continent> continents = new ArrayList<Continent>();
 		continents.add(new Continent().id(Long.valueOf(1)).name("Europe"));
 		continents.add(new Continent().id(Long.valueOf(2)).name("Asia"));
@@ -58,8 +70,9 @@ public class HomeController extends BaseController {
 		
 		return continentDtoList;
 	}
+	*/
 	
-	private List<PersonDto> loadPersons() {
+	public static List<PersonDto> loadPersons() {
 		return RandomDateGenerator.generateRandomPersons(100);
 		
 		/*
