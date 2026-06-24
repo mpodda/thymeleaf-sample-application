@@ -26,8 +26,39 @@
 	<!-- / Hidden -->
 	
 	<!-- Datalist -->
-		
-	<!-- ./ Datalist -->
+		<th:block th:fragment="datalist(label, name, value, filterList)" th:with="id=${name} + '_' + ${randomSuffix}, datalistId=${id} + '_datalist', hiddenId= ${id} + '_hidden'">
+			<div class="col-md-1">
+				<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
+			</div>
+			
+			<div class="col-md-3">
+				<input type="hidden" th:id="${hiddenId}" th:name="${name}" th:value="${value}" role="datalist-hidden" th:text-input-id="${id}" />
+				<input class="form-control" th:list="${datalistId}" th:value="${value.label()}" th:name="${name}+'_input'" th:id="${id}" placeholder="Type to search..." role="datalist-input" th:session-attribute="${sessionAttribute}" th:random-suffix="${randomSuffix}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'">
+				<datalist th:id="${datalistId}">
+					 <option th:each="entry: ${filterList}" th:data="${entry}" th:value="${entry.label()}">
+				</datalist>
+				
+				<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
+			</div>
+		</th:block>
+	<!-- / Datalist -->
 	
+	<!-- Calendar -->
+		<th:block th:fragment="calendar (label, name, value)">
+			<table>
+				<tr>
+					<td>
+						<table>
+							<tr>
+								<td><button type="button" class="btn btn-light">&lt;</button></td>
+								<td></td>
+								<td><button type="button" class="btn btn-light">&gt;</button></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</th:block>
+	<!-- / Calendar -->
 </body>
 </html>

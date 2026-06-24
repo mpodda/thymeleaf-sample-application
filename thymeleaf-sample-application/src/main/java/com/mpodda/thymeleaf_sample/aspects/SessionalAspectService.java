@@ -23,7 +23,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
-import com.mpodda.thymeleaf_sample.controllers.pages.HomeController;
 import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingAndSortingDto;
 import com.mpodda.thymeleaf_sample.domain.enums.SessionalConstants;
@@ -35,7 +34,6 @@ import jakarta.servlet.http.HttpSession;
 @Component
 public class SessionalAspectService <Dto extends BaseDto> {
 
-    private final HomeController homeController;
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionalAspectService.class);
 	
 	@Value("${tsa.page-size}")
@@ -49,12 +47,6 @@ public class SessionalAspectService <Dto extends BaseDto> {
 	@Autowired
 	private PagingAndSortingService<Dto> pagingAndSortingService;
 
-
-    SessionalAspectService(HomeController homeController) {
-        this.homeController = homeController;
-    }
-	
-	
 	@Pointcut("within(com.mpodda.thymeleaf_sample.controllers.pages..*)")
 	private void anyPageControllerExecution() {
 		

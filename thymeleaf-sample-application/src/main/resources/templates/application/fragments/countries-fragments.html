@@ -21,8 +21,8 @@
 						
 						<tbody>
 							<tr th:each="record : ${countries}">
-								<td th:text="${record.id}"></td>
 								<td th:text="${record.name}"></td>
+								<td th:text="${record.continent.name}"></td>
 								<td><button class="btn btn-light" role="edit-country" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
 							</tr>
 						</tbody>
@@ -35,6 +35,10 @@
 	<th:block th:fragment="edit-country">
 		<section th:replace="~{application/layouts/admin-form-layout :: admin-form-layout(object = ${country}, formContent = ~{::form-content}, sessionAttribute = 'countries')}">
 			<th:block th:fragment="form-content">
+				<div class="row">
+					<th:block th:insert="~{application/components/form-components :: datalist (label='Continent', name='continent', value=${country.continent}, filterList=${filteredContinents})}"></th:block>
+				</div>
+			
 				<div class="row">
 					<th:block th:insert="~{application/components/form-components :: text (label='Name', name='name', value=${country.name})}"></th:block>
 				</div>

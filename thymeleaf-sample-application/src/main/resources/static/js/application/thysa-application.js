@@ -50,7 +50,9 @@ const ValidChildNodePlaceholderTags = Object.freeze({
 	   SPAN : Symbol("SPAN"),
 	      P : Symbol("P"),
 	    NAV : Symbol("NAV"),
-	  TABLE : Symbol("TABLE")
+	  TABLE : Symbol("TABLE"),
+   DATALIST : Symbol("DATALIST"),
+     OPTION : Symbol("OPTION")
 });
 
 function getValidChildNode(parentNode) {
@@ -65,6 +67,22 @@ function getValidChildNode(parentNode) {
 	}
 	
 	return null;
+}
+
+function getValidChildNodes(parentNode) {
+	let validChildNodes = [];
+	
+	if (parentNode.hasChildNodes()) {
+		for (const childNode of parentNode.childNodes) {
+			if (childNode.nodeType === Node.ELEMENT_NODE || childNode.nodeType === Node.TEXT_NODE) {
+				if (Object.keys(ValidChildNodePlaceholderTags).includes(childNode.tagName)) {
+					validChildNodes.push (childNode);
+				}
+			}
+		}
+	}
+	
+	return validChildNodes;
 }
 
 export async function setContentFromText(htmlText, contentPlaceholder) {
@@ -89,6 +107,10 @@ export async function setContentFromFragment(contentNode, contentPlaceholder) {
 	return contentNode;	
 }
 
+export async function replaceAllChildNodes(parentNode, newParentNode) {
+	parentNode.replaceChildren(...newParentNode.childNodes);
+}
+
 export function createHTMLFragment(htmlText, fragmentId) {
 	let fragmentText = document.createElement("body");
 	fragmentText.innerHTML = htmlText;
@@ -102,7 +124,7 @@ export function createHTMLFragmentFromRole(htmlText, role) {
 	let fragmentText = document.createElement("body");
 	fragmentText.innerHTML = htmlText;
 	
-	let fragment = getValidChildNode(fragmentText.querySelectorAll(`[role="${role}"]`)[0]);  
+	let fragment = getValidChildNode(fragmentText.querySelectorAll(`[role="${role}"]`)[0]);
 	
 	return document.importNode(fragment, true);
 }
@@ -365,6 +387,97 @@ export let pagingAndSortingBySessionAttribute = async(sessionAttribute) => {
 
 
 /*
+  ---------------------
+  -- Form Components -- 
+  ---------------------
+*/
+
+//export let formComponents = async () => {
+export async function formComponents() {
+	async function initDatalistInputEvents() {
+		const dataListInputElements = document.querySelectorAll('[role="datalist-input"]');
+		
+		for (const dataListInputElement of dataListInputElements) {
+			dataListInputElement.addEventListener("input", async () => {
+				await intecommunication.onDataListInput (
+					{
+					"sessionAttribute": dataListInputElement.getAttribute("session-attribute"),
+					            "name": dataListInputElement.name,
+					           "value": dataListInputElement.value,
+				        "randomSuffix": dataListInputElement.getAttribute("random-suffix"),
+						  "dataListId": `${dataListInputElement.id}_datalist`
+						
+					}
+				);
+			});
+			
+			dataListInputElement.addEventListener("change", async () => {
+				/* User selects option */
+				if (isOptionValue(dataListInputElement.value, `${dataListInputElement.id}_datalist`)) {
+					document.getElementById(`${dataListInputElement.id}_hidden`).value = getOptionDataByInputValue(dataListInputElement.value, `${dataListInputElement.id}_datalist`);
+				}
+			});
+		}
+
+		/* In case of fields rerendering due to user input error, take value of Hidden Element (is binded with Back-End object)  and put it in to Datalist Input Element  */		
+		const dataListHiddenElements = document.querySelectorAll('[role="datalist-hidden"]');
+		
+		for (const dataListHiddenElement of dataListHiddenElements) {
+			dataListHiddenElement.addEventListener("change", async () => {
+				document.getElementById(dataListHiddenElement.getAttribute("text-input-id")).value = getOptionValueByInputData(dataListHiddenElement.value, `${dataListHiddenElement.getAttribute('text-input-id')}_datalist`);
+			});
+		}
+		
+	}
+	
+	function isOptionValue(value, datalistId) {
+		const options = document.getElementById(datalistId).getElementsByTagName("option");
+		
+		for (const option of options) {
+			if (option.value === value) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	function getOptionDataByInputValue(value, datalistId) {
+		const options = document.getElementById(datalistId).getElementsByTagName("option");
+
+		for (const option of options) {
+			if (option.value === value) {
+				return option.getAttribute("data");
+			}
+		}
+
+		return null;
+	}
+	
+	function getOptionValueByInputData(data, datalistId) {
+		const options = document.getElementById(datalistId).getElementsByTagName("option");
+
+		for (const option of options) {
+			if (option.getAttribute("data") === data) {
+				return option.value;
+			}
+		}
+
+		return null;
+	}	
+	
+	async function init() {
+		await initDatalistInputEvents();
+	}
+	
+	await init();
+	
+	return {
+		isOptionValue
+	}
+};
+
+/*
   -----------------------
   -- Intecommunication -- 
   -----------------------
@@ -379,6 +492,8 @@ export let pagingAndSortingBySessionAttribute = async(sessionAttribute) => {
 		this.onPushFragment = async (data) => {};
 		
 		this.onPopFragment = async (data) => {};
+		
+		this.onDataListInput = async (data) => {};
 	}
 }
 

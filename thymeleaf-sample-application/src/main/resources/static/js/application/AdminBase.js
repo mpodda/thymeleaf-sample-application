@@ -2,6 +2,8 @@ import {intecommunication as app_itercom, postForm} from './thysa-application.js
 import {pushFragment as pushFragment, createHTMLFragmentFromRole, setContentFromFragment} from './thysa-application.js';
 import {pagingAndSortingBySessionAttribute as pagingAndSortingBySessionAttribute} from './thysa-application.js';
 import {HttpStatus}  from './thysa-application.js';
+import {formComponents as formComponents}  from './thysa-application.js';
+
 
 export class AdminBase {
 	static currentInstances = [];
@@ -13,6 +15,7 @@ export class AdminBase {
 	#listValueUrl = null;
 	#saveValueUrl = null;
 	
+	#formComponents = null;
 	
 	constructor() {
 		AdminBase.currentInstances.push(this);
@@ -27,15 +30,36 @@ export class AdminBase {
 		
 		app_itercom.onPopFragment = async (sessionAttribute) => {
 			await pagingAndSortingBySessionAttribute(sessionAttribute);
-			
+
 			for (const adminBaseInstance of AdminBase.currentInstances) {
 				if (adminBaseInstance.SessionAttribute === sessionAttribute) {
 					await adminBaseInstance.init();
 				}
 			}
 		}
+		
+		app_itercom.onPushFragment = async (sessionAttribute) => {
+			for (const adminBaseInstance of AdminBase.currentInstances) {
+				if (adminBaseInstance.SessionAttribute === sessionAttribute) {
+					adminBaseInstance.FormComponents = await formComponents();
+				}
+			}
+		}
+		
+		app_itercom.onDataListInput = async (data) => {
+			for (const adminBaseInstance of AdminBase.currentInstances) {
+				if (adminBaseInstance.SessionAttribute === data.sessionAttribute) {
+					if (!adminBaseInstance.FormComponents.isOptionValue(data.value, data.dataListId)) {
+						await adminBaseInstance.filter(data);
+					}
+				}
+			}
+		}
 	}
 	
+	/** 
+	 * Rerenders form fields. Usually in case of User Input validation errors
+	 */
 	async #pushFormFields(htmlText) {
 		let currentContentPlaceholder = null;
 		
@@ -49,8 +73,22 @@ export class AdminBase {
 		}		
 		
 		const fieldsFragment = createHTMLFragmentFromRole(htmlText, 'form-content');
-
+		
 		await setContentFromFragment (fieldsFragment, currentContentPlaceholder);
+		
+		/* Re-init form fields events, etc. */
+		await formComponents();
+		
+		/* 
+		Collect all datalist related hidden fields (contain binding data) and dispatch event for each of them 
+		in order to catch it the listener and put the corresponding value in to the 
+		Datalist related text input element 
+		*/
+		const dataListHiddenElements = fieldsFragment.querySelectorAll('[role="datalist-hidden"]');
+		
+		for (const dataListHiddenElement of dataListHiddenElements) {
+			dataListHiddenElement.dispatchEvent(new Event("change"));
+		}
 	}
 	
 	async #initSaveEvent(containerFragment) {
@@ -63,15 +101,12 @@ export class AdminBase {
 				if (form.getAttribute("role") === "form") {
 					const httpRequest = await postForm(form, this.#saveValueUrl);
 					
-//					console.info("httpRequest:", "status=", httpRequest.status,  "responseText=", httpRequest.responseText);
-					
 					if (httpRequest.status === Number (HttpStatus.OK.description)) {
 						await pushFragment(this.#listValueUrl, this.#sessionAttribute);
 
-						app_itercom.onDataChange(this.#sessionAttribute);
+						await app_itercom.onDataChange(this.#sessionAttribute);
 
-						app_itercom.onPopFragment(this.#sessionAttribute);
-
+						await app_itercom.onPopFragment(this.#sessionAttribute);
 					} else {
 						await this.#pushFormFields(httpRequest.responseText);						
 					}
@@ -91,9 +126,9 @@ export class AdminBase {
 
 			await pushFragment(this.#listValueUrl, this.#sessionAttribute);
 			
-			app_itercom.onDataChange(this.#sessionAttribute);
+			await app_itercom.onDataChange(this.#sessionAttribute);
 			
-			app_itercom.onPopFragment(this.#sessionAttribute);
+			await app_itercom.onPopFragment(this.#sessionAttribute);
 			
 		 	console.info("Cancel");
 		});		
@@ -109,6 +144,8 @@ export class AdminBase {
 
 		/* Cancel */
 		await this.#initCancelEvent(formFragment);
+		
+		await app_itercom.onPushFragment(this.#sessionAttribute);
 	}
 	
 	async addValue() {
@@ -121,6 +158,8 @@ export class AdminBase {
 		
 		/* Cancel */
 		await this.#initCancelEvent(formFragment);
+		
+		await app_itercom.onPushFragment(this.#sessionAttribute);
 	}
 	
 	get SessionAttribute() {
@@ -161,5 +200,13 @@ export class AdminBase {
 	
 	set SaveValueUrl(value) {
 		this.#saveValueUrl = value;
+	}
+	
+	get FormComponents() {
+		return this.#formComponents;
+	}
+	
+	set FormComponents(value) {
+		this.#formComponents = value;
 	}
 }

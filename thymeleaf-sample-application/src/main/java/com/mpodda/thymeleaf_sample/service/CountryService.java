@@ -25,6 +25,7 @@ public class CountryService extends IdentifiableEntityAndDtoService<Country, Cou
 	public CountryDto dtoDefaultInstance() {
 		if (countryDto == null) {
 			countryDto = new CountryDto();
+			countryDto.setContinent(this.continentService.dtoDefaultInstance());
 		}
 		
 		return countryDto;
@@ -53,5 +54,9 @@ public class CountryService extends IdentifiableEntityAndDtoService<Country, Cou
 	@Override
 	public AbstractJpaDao<Country> getRepository() {
 		return this.countryRepository;
+	}
+	
+	public boolean isNameExists(String name) {
+		return this.countryRepository.isNameExists(name);
 	}
 }

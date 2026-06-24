@@ -2,7 +2,7 @@ package com.mpodda.thymeleaf_sample.domain.dto;
 
 import com.mpodda.thymeleaf_sample.domain.entities.Country;
 
-public class CountryDto extends BaseIdentifiableDto<Country, CountryDto> {
+public class CountryDto extends BaseIdentifiableDto<Country, CountryDto>  {
 	private static final long serialVersionUID = -3008445710518613613L;
 	
 	private String name;

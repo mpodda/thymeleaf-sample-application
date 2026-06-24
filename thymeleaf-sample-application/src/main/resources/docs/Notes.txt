@@ -312,3 +312,34 @@ function isValidStatus(status) {
 }
 
 ---------------------------------------------------------------------------------------------------------------------------------------
+
+oninput="console.info(this.value)"
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+==========================================================
+== Separate Spring Boot Session in it's own data source ==
+==========================================================
+
+</> Properties
+spring.session.jdbc.schema=myschema
+
+
+</> Java
+@Bean
+@SpringSessionDataSource
+@ConfigurationProperties("app.session.datasource")
+public DataSource springSessionDataSource() {
+    return DataSourceBuilder.create().build();
+}
+
+
+</> Properties
+app.session.datasource.url=jdbc:postgresql://localhost:5432/session_db
+app.session.datasource.username=session_user
+app.session.datasource.password=secret
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+

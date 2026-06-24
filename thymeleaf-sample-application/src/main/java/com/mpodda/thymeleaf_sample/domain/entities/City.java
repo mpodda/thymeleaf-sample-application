@@ -16,4 +16,20 @@ public class City extends IdentifiableEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="p_couid")
 	private Country country;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
 }

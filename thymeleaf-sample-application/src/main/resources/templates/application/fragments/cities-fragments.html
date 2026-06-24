@@ -14,15 +14,18 @@
 						<thead>
 							<tr>
 								<th th:replace="~{application/components/table-components :: column-header('Name', 'name')}"></th>
+								<th th:replace="~{application/components/table-components :: column-header('Country', 'country.name')}"></th>
+								<th th:replace="~{application/components/table-components :: column-header('Continent', 'country.continent.name')}"></th>
 								<th></th>
 							</tr>
 						</thead>
 						
 						<tbody>
-							<tr th:each="record : ${continents}">
-								<td th:text="${record.id}"></td>
+							<tr th:each="record : ${cities}">
 								<td th:text="${record.name}"></td>
-								<td><button class="btn btn-light" role="edit-continent" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
+								<td th:text="${record.country.name}"></td>
+								<td th:text="${record.country.continent.name}"></td>
+								<td><button class="btn btn-light" role="edit-city" th:data-id="${record.id}"><i class="fa-regular fa-pen-to-square"></i></button></td>
 							</tr>
 						</tbody>
 					</table>
