@@ -108,6 +108,7 @@ public class CountriesController extends BaseController {
 		} else {
 			try {
 				modelAttribute = this.countryService.saveFromDto(modelAttribute);
+				this.continentFilterService.refresh();
 			} catch (Exception e) {
 				response.setStatus(HttpStatus.BAD_REQUEST.value());
 				e.printStackTrace();

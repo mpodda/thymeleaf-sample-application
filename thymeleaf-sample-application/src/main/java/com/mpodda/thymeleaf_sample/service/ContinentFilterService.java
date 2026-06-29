@@ -1,6 +1,5 @@
 package com.mpodda.thymeleaf_sample.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;

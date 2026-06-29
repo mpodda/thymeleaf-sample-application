@@ -12,30 +12,38 @@ export class CountriesAdmin extends AdminBase {
 		this.ListValueUrl = "/list-countries";
 		this.SaveValueUrl = "/save-country";
 		this.EditValueUrl = "/edit-country?countryId";
-	}
-	
-	
-	async initGridEvents() {
-		/* Edit Countries */
-		const editCountryButtons = document.querySelectorAll('[role="edit-country"]');
+		
+		this.AddValueRole = "add-country";
+		this.EditValueRole = "edit-country";
 
-		for (const editCountryButton of editCountryButtons) {
-			editCountryButton.addEventListener("click", async () => {
-				const countryId = editCountryButton.getAttribute("data-id");
-				await this.editValue(countryId);
-			});
-		}
 	}
 	
-	async #initEvents() {
-		/* Add Country */
-		const addCountryButton = document.querySelectorAll('[role="add-country"]')[0];
-		addCountryButton.addEventListener("click", async () => {
-			await this.addValue();
-		});
-
-		await this.initGridEvents();
+	async initEvents() {
+		console.info("Init events for Countries Admin");
 	}
+
+		
+//	async initGridEvents() {
+//		/* Edit Countries */
+//		const editCountryButtons = document.querySelectorAll('[role="edit-country"]');
+//
+//		for (const editCountryButton of editCountryButtons) {
+//			editCountryButton.addEventListener("click", async () => {
+//				const countryId = editCountryButton.getAttribute("data-id");
+//				await this.editValue(countryId);
+//			});
+//		}
+//	}
+	
+//	async #initEvents() {
+//		/* Add Country */
+//		const addCountryButton = document.querySelectorAll('[role="add-country"]')[0];
+//		addCountryButton.addEventListener("click", async () => {
+//			await this.addValue();
+//		});
+//
+//		await this.initGridEvents();
+//	}
 
 	async filter(data) {
 //		console.info("filter:", data);
@@ -80,9 +88,9 @@ export class CountriesAdmin extends AdminBase {
 		
 	}
 	
-	async init() {
-		await this.#initEvents(); 
-	}
+//	async init() {
+//		await this.#initEvents();
+//	}
 	
 
 	static async getInstance() {
@@ -92,6 +100,4 @@ export class CountriesAdmin extends AdminBase {
 		
 		return countriesAdmin;
 	}
-	
-	
 }

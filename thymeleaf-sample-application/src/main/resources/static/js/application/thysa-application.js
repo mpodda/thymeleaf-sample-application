@@ -415,6 +415,14 @@ export async function formComponents() {
 				/* User selects option */
 				if (isOptionValue(dataListInputElement.value, `${dataListInputElement.id}_datalist`)) {
 					document.getElementById(`${dataListInputElement.id}_hidden`).value = getOptionDataByInputValue(dataListInputElement.value, `${dataListInputElement.id}_datalist`);
+					
+					await intecommunication.onSelectionChange (
+						{
+						"sessionAttribute" : dataListInputElement.getAttribute("session-attribute"),
+						              "id" : dataListInputElement.id,
+						           "value" :  document.getElementById(`${dataListInputElement.id}_hidden`).value
+						}
+					);
 				}
 			});
 		}
@@ -427,7 +435,6 @@ export async function formComponents() {
 				document.getElementById(dataListHiddenElement.getAttribute("text-input-id")).value = getOptionValueByInputData(dataListHiddenElement.value, `${dataListHiddenElement.getAttribute('text-input-id')}_datalist`);
 			});
 		}
-		
 	}
 	
 	function isOptionValue(value, datalistId) {
@@ -464,10 +471,22 @@ export async function formComponents() {
 		}
 
 		return null;
+	}
+	
+	async function initSelectEvents() {
+		const selectElements = document.querySelectorAll('[role="select"]');
+		
+		for (const selectElement of selectElements) {
+			selectElement.addEventListener("change", async () => {
+				console.info("value", selectElement.value, "selected");
+			});
+		}
 	}	
 	
 	async function init() {
 		await initDatalistInputEvents();
+		
+		await initSelectEvents();
 	}
 	
 	await init();
@@ -494,6 +513,8 @@ export async function formComponents() {
 		this.onPopFragment = async (data) => {};
 		
 		this.onDataListInput = async (data) => {};
+		
+		this.onSelectionChange = async (data) => {};
 	}
 }
 

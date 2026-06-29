@@ -17,7 +17,12 @@ export class AdminBase {
 	
 	#formComponents = null;
 	
+	#addValueRole = null;
+	#editValueRole = null;
+	
 	constructor() {
+		//this.initEvents = async () => {}; 
+			
 		AdminBase.currentInstances.push(this);
 		
 		app_itercom.onDataChange = async(sessionAttribute) => {
@@ -55,6 +60,14 @@ export class AdminBase {
 				}
 			}
 		}
+		
+		app_itercom.onSelectionChange = async (data) => {
+			for (const adminBaseInstance of AdminBase.currentInstances) {
+				if (adminBaseInstance.SessionAttribute === data.sessionAttribute) {
+					await adminBaseInstance.selectionChange(data);
+				}
+			}
+		};
 	}
 	
 	/** 
@@ -134,6 +147,37 @@ export class AdminBase {
 		});		
 	}
 	
+	async initEvents() {}
+	
+	async filter(data) {}
+	
+	async selectionChange(data) {}
+	
+	async initGridEvents() {
+		/* Add value */
+		const addValueButton = document.querySelectorAll(`[role="${this.#addValueRole}"]`)[0];
+		addValueButton.addEventListener("click", async () => {
+			await this.addValue();
+		});
+		
+		
+		/* Edit value */
+		const editValueButtons = document.querySelectorAll(`[role="${this.#editValueRole}"]`);
+
+		for (const editValueButton of editValueButtons) {
+			editValueButton.addEventListener("click", async () => {
+				const valueId = editValueButton.getAttribute("data-id");
+				await this.editValue(valueId);
+			});
+		}
+	}	
+	
+	async init() {
+		await this.initGridEvents();
+		
+		await this.initEvents();
+	}
+	
 	async editValue(id) {
 		console.info("Edit Value with id", id);
 		
@@ -155,6 +199,7 @@ export class AdminBase {
 
 		/* Save */
 		await this.#initSaveEvent(formFragment);
+		
 		
 		/* Cancel */
 		await this.#initCancelEvent(formFragment);
@@ -209,4 +254,22 @@ export class AdminBase {
 	set FormComponents(value) {
 		this.#formComponents = value;
 	}
+	
+	get AddValueRole() {
+		return this.#addValueRole;
+	}
+	
+	set AddValueRole(value) {
+		this.#addValueRole = value;
+	}
+	
+	get EditValueRole() {
+		return this.#editValueRole;
+	}
+	
+	set EditValueRole(value) {
+		this.#editValueRole = value;
+	}
+	
+	
 }

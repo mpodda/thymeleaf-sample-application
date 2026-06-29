@@ -1,8 +1,11 @@
 package com.mpodda.thymeleaf_sample.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.mpodda.thymeleaf_sample.domain.dto.CountryDto;
+import com.mpodda.thymeleaf_sample.domain.entities.Continent;
 import com.mpodda.thymeleaf_sample.domain.entities.Country;
 import com.mpodda.thymeleaf_sample.repository.AbstractJpaDao;
 import com.mpodda.thymeleaf_sample.repository.CountryRepository;
@@ -37,8 +40,12 @@ public class CountryService extends IdentifiableEntityAndDtoService<Country, Cou
 		
 		countryDto.setId(country.getId());
 		countryDto.setName(country.getName());
-		
-		countryDto.setContinent(this.continentService.fromEntity(country.getContinent()));
+
+		try {
+			countryDto.setContinent(this.continentService.fromEntity(country.getContinent()));
+		} catch (Exception e) {
+			countryDto.setContinent(this.continentService.fromEntity(new Continent().id(country.getContinent().getId())));
+		}
 		
 		return countryDto;
 	}
@@ -58,5 +65,18 @@ public class CountryService extends IdentifiableEntityAndDtoService<Country, Cou
 	
 	public boolean isNameExists(String name) {
 		return this.countryRepository.isNameExists(name);
+	}
+	
+	public List<Country> findAllFullLoad() {
+		final List<Continent> continentsList = this.continentService.findAll();
+		List<Country> countriesList = this.findAll();
+		
+		countriesList.forEach (
+			country -> {
+				country.setContinent(continentsList.stream().filter(continent -> continent.getId().equals(country.getContinent().getId())).findFirst().orElse(null));	
+			}
+		);
+		
+		return countriesList;
 	}
 }

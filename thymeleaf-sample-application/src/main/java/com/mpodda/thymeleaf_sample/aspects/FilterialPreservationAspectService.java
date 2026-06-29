@@ -13,19 +13,20 @@ import org.springframework.ui.Model;
 
 import com.mpodda.thymeleaf_sample.annotations.FilterialMethod;
 import com.mpodda.thymeleaf_sample.annotations.FilterialPreservations;
-import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
+import com.mpodda.thymeleaf_sample.domain.dto.BaseIdentifiableDto;
 import com.mpodda.thymeleaf_sample.domain.dto.FilterDto;
 
 import jakarta.servlet.http.HttpSession;
 
 @Aspect
 @Component
-public class FilterialPreservationAspectService <Dto extends BaseDto> {
+public class FilterialPreservationAspectService <Dto extends BaseIdentifiableDto<?, ?>> {
 	@Pointcut("within(com.mpodda.thymeleaf_sample.controllers.pages..*)")
 	private void anyPageControllerExecution() {
 		
 	}
 
+	@SuppressWarnings("null")
 	@After ("anyPageControllerExecution()  && args(model, httpSession,..)")
 	public void afterPageControllerExecution(JoinPoint joinPoint, Model model, HttpSession httpSession) {
 		final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
@@ -41,6 +42,7 @@ public class FilterialPreservationAspectService <Dto extends BaseDto> {
 		}
 	}
 	
+	@SuppressWarnings({ "unchecked", "null" })
 	@Before ("anyPageControllerExecution()  && args(model, httpSession,..)")
 	public void beforePageControllerExecution(JoinPoint joinPoint, Model model, HttpSession httpSession) {
 		final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
@@ -48,7 +50,7 @@ public class FilterialPreservationAspectService <Dto extends BaseDto> {
 		final boolean isFilterialMethod = (methodSignature.getMethod().getAnnotation(FilterialMethod.class) != null);
 		
 		if (isFilterialMethod) {
-			final FilterDto filterDto = (FilterDto)model.getAttribute("filterDto");
+			final FilterDto<Dto> filterDto = (FilterDto<Dto>)model.getAttribute("filterDto");
 			
 			if (filterDto != null) {
 				model.addAttribute("randomSuffix", filterDto.getRandomSuffix());

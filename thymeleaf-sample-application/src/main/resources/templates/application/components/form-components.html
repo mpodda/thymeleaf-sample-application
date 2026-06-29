@@ -7,40 +7,54 @@
 </head>
 <body>
 	<!-- Text -->
-		<th:block th:fragment="text (label, name, value)" th:with="readOnly = ${readOnly}, id=${name} + '_' + ${randomSuffix}">
-			<div class="col-md-1">
-				<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
-			</div>
-			<div class="col-md-3">
-				<input type="text" class="form-control" th:id="${id}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'" th:name="${name}" th:placeholder="${label}" th:value="${value}" />
-				
-				<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
-			</div>
-		</th:block>
+	<th:block th:fragment="text (label, name, value)" th:with="readOnly = ${readOnly}, id=${name} + '_' + ${randomSuffix}">
+		<div class="col-md-1">
+			<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
+		</div>
+		<div class="col-md-3">
+			<input type="text" class="form-control" th:id="${id}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'" th:name="${name}" th:placeholder="${label}" th:value="${value}" />
+			
+			<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
+		</div>
+	</th:block>
 	<!-- / Text -->
 	
 	<!-- Hidden -->
-		<th:block th:fragment="hidden (name, value)">
-			<input type="hidden" th:name="${name}" th:value="${value}">
-		</th:block>
+	<th:block th:fragment="hidden (name, value)">
+		<input type="hidden" th:name="${name}" th:value="${value}">
+	</th:block>
 	<!-- / Hidden -->
 	
+	<!-- Select -->
+	<th:block th:fragment="select (label, name, value, dataList)" th:with="id=${name} + '_' + ${randomSuffix}">
+		<div class="col-md-1">
+			<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
+		</div>
+	
+		<div class="col-md-3">
+			<select class="form-select" th:name="${name}" th:value="${value}" role="select">
+				<option th:each="entry: ${dataList}" th:data="${entry}" th:value="${entry}" th:text="${entry.label()}"></option>
+			</select>
+		</div>
+	</th:block>
+	<!-- / Select -->
+	
 	<!-- Datalist -->
-		<th:block th:fragment="datalist(label, name, value, filterList)" th:with="id=${name} + '_' + ${randomSuffix}, datalistId=${id} + '_datalist', hiddenId= ${id} + '_hidden'">
-			<div class="col-md-1">
-				<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
-			</div>
+	<th:block th:fragment="datalist(label, name, value, filterList)" th:with="id=${name} + '_' + ${randomSuffix}, datalistId=${id} + '_datalist', hiddenId= ${id} + '_hidden'">
+		<div class="col-md-1">
+			<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
+		</div>
+		
+		<div class="col-md-3">
+			<input type="hidden" th:id="${hiddenId}" th:name="${name}" th:value="${value}" role="datalist-hidden" th:text-input-id="${id}" />
+			<input class="form-control" th:list="${datalistId}" th:value="${value.label()}" th:name="${name}+'_input'" th:id="${id}" placeholder="Type to search..." role="datalist-input" th:session-attribute="${sessionAttribute}" th:random-suffix="${randomSuffix}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'">
+			<datalist th:id="${datalistId}">
+				 <option th:each="entry: ${filterList}" th:data="${entry}" th:value="${entry.label()}">
+			</datalist>
 			
-			<div class="col-md-3">
-				<input type="hidden" th:id="${hiddenId}" th:name="${name}" th:value="${value}" role="datalist-hidden" th:text-input-id="${id}" />
-				<input class="form-control" th:list="${datalistId}" th:value="${value.label()}" th:name="${name}+'_input'" th:id="${id}" placeholder="Type to search..." role="datalist-input" th:session-attribute="${sessionAttribute}" th:random-suffix="${randomSuffix}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'">
-				<datalist th:id="${datalistId}">
-					 <option th:each="entry: ${filterList}" th:data="${entry}" th:value="${entry.label()}">
-				</datalist>
-				
-				<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
-			</div>
-		</th:block>
+			<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
+		</div>
+	</th:block>
 	<!-- / Datalist -->
 	
 	<!-- Calendar -->

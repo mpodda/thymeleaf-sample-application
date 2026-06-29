@@ -32,6 +32,15 @@ public class Continent extends IdentifiableEntity {
 	}
 	
 	@Override
+	public boolean equals(Object object) {
+		if (super.equals(object)) {
+			return this.name.equalsIgnoreCase(((Continent)object).getName());
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public String toString() {
 		return super.toJson();
 	}
