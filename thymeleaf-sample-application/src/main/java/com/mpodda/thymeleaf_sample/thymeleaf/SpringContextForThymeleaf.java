@@ -18,4 +18,10 @@ public class SpringContextForThymeleaf implements ApplicationContextAware {
 	public static <T> T getBean(@NonNull Class<T> beanClass) {
         return context.getBean(beanClass);
     }	
+
+	public static void s() {}
+	
+	public static Object getBeanByName(@NonNull String beanName) {
+		return context.getBean(beanName);
+	}
 }

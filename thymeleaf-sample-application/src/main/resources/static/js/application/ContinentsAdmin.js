@@ -17,32 +17,6 @@ export class ContinentsAdmin extends AdminBase {
 	}
 	
 	
-//	async initGridEvents() {
-//		/* Edit Continents */
-//		const editCondinentButtons = document.querySelectorAll('[role="edit-continent"]');
-//
-//		for (const editCondinentButton of editCondinentButtons) {
-//			editCondinentButton.addEventListener("click", async () => {
-//				const condinentId = editCondinentButton.getAttribute("data-id");
-//				await this.editValue(condinentId);
-//			});
-//		}
-//	}
-	
-//	async #initEvents() {
-//		/* Add Continent */
-//		const addContinentButton = document.querySelectorAll('[role="add-continent"]')[0];
-//		addContinentButton.addEventListener("click", async () => {
-//			await this.addValue();
-//		});
-//
-//		await this.initGridEvents();
-//	}
-	
-//	async init() {
-//		await this.#initEvents(); 
-//	}
-	
 	async initEvents() {
 		console.info("Init events for Continents Admin");
 	}

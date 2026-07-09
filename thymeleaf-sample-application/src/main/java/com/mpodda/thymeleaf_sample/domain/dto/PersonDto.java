@@ -1,29 +1,21 @@
 package com.mpodda.thymeleaf_sample.domain.dto;
 
+import java.time.LocalDate;
 import java.util.Date;
 
-public class PersonDto extends BaseIdentifiableDto {
+import com.mpodda.thymeleaf_sample.domain.entities.Person;
+
+public class PersonDto extends BaseIdentifiableDto<Person, PersonDto> {
 	private static final long serialVersionUID = 6849199190478217393L;
 	
 	private String name;
 	
 	private Integer age;
 	
-	private String country;
+	private CountryDto country;
 	
-	private Date dateOfBirth;
+	private LocalDate dateOfBirth;
 	
-	public PersonDto() {
-		
-	}
-	
-	public PersonDto(Long id, String name, Integer age, String country, Date dateOfBirth) {
-		this.setId(id);
-		this.name = name;
-		this.age = age;
-		this.country = country;
-		this.dateOfBirth = dateOfBirth;
-	}
 
 	public String getName() {
 		return name;
@@ -41,19 +33,49 @@ public class PersonDto extends BaseIdentifiableDto {
 		this.age = age;
 	}
 
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
-	}
-
-	public Date getDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
 
-	public void setDateOfBirth(Date dateOfBirth) {
+	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
+	}
+
+	public CountryDto getCountry() {
+		return country;
+	}
+
+	public void setCountry(CountryDto country) {
+		this.country = country;
+	}
+	
+	public PersonDto id(Long id) {
+		this.setId(id);
+		
+		return this;
+	}
+	
+	public PersonDto name(String name) {
+		this.name = name;
+		
+		return this;
+	}
+	
+	public PersonDto age(Integer age) {
+		this.age = age;
+		
+		return this;
+	}
+	
+	public PersonDto dateOfBirth(LocalDate dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+		
+		return this;
+	}
+	
+	public PersonDto country(CountryDto country) {
+		this.country = country;
+		
+		return this;
 	}
 }

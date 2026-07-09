@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.aopalliance.aop.Advice;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -32,14 +33,12 @@ import jakarta.servlet.http.HttpSession;
 
 @Aspect
 @Component
-public class SessionalAspectService <Dto extends BaseDto> {
-
+public class SessionalAspectService <Dto extends BaseDto> /*implements Advice*/ {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionalAspectService.class);
 	
 	@Value("${tsa.page-size}")
 	private int pageSize; 
 
-	
 	@SuppressWarnings("rawtypes")
 	@Autowired
     private FindByIndexNameSessionRepository sessionRepository;

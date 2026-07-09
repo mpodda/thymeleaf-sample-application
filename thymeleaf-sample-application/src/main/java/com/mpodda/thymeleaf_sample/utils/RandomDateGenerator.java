@@ -11,7 +11,7 @@ public final class RandomDateGenerator {
 		List<PersonDto> personDtoList = new ArrayList<PersonDto>(numberOfRecords);
 		
 		for (int recordNumber = 0; recordNumber < numberOfRecords; recordNumber++) {
-			
+			/*
 			personDtoList.add(new PersonDto (
 				Math.abs(new Random().nextLong()),
 				new StringBuilder().append(Generators.nextString(5, 12)).append(" ").append(Generators.nextString(5, 12)).toString(),
@@ -19,6 +19,7 @@ public final class RandomDateGenerator {
 				Generators.nextString(5, 15),
 				Generators.nextDate()
 			));
+			*/
 		}
 		
 		return personDtoList;

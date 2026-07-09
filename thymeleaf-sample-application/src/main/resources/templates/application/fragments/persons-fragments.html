@@ -8,13 +8,12 @@
 <body>
 
 	<th:block th:fragment="persons-list">
-		<th:block th:insert="~{application/layouts/list-layout :: admin-data-list (sessionAttribute = 'persons', ref='person', title='Persons', body = ~{::data-lst-body})}">
+		<th:block th:insert="~{application/layouts/list-layout :: admin-data-list (sessionAttribute = 'persons', ref='person', title=#{persons.list.title}, body = ~{::data-lst-body})}">
 			<th:block th:fragment="data-lst-body">
 				<section th:insert="~{application/components/table-components :: grid-fragment(sessionAttribute = 'persons', gridContent= ~{::gridContent})}">
 					<table class="table table-hover" th:fragment="gridContent">
 						<thead>
 							<tr>
-								<th th:replace="~{application/components/table-components :: column-header('Id','id')}"></th>
 								<th th:replace="~{application/components/table-components :: column-header('Name', 'name')}"></th>
 								<th th:replace="~{application/components/table-components :: column-header('Age','age')}"></th>
 								<th th:replace="~{application/components/table-components :: column-header('Date of Birth', 'dateOfBirth')}"></th>
@@ -24,7 +23,6 @@
 						
 						<tbody>
 							<tr th:each="record : ${persons}">
-								<td th:text="${record.id}"></td>
 								<td th:text="${record.name}"></td>
 								<td th:text="${record.age}"></td>
 								<td th:text="${record.dateOfBirth}"></td>

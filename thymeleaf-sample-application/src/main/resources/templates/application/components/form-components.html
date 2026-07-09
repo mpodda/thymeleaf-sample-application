@@ -7,12 +7,12 @@
 </head>
 <body>
 	<!-- Text -->
-	<th:block th:fragment="text (label, name, value)" th:with="readOnly = ${readOnly}, id=${name} + '_' + ${randomSuffix}">
+	<th:block th:fragment="text (label, field, name)" th:with="readOnly = ${readOnly}, id=${field} + '_' + ${randomSuffix}">
 		<div class="col-md-1">
 			<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
 		</div>
 		<div class="col-md-3">
-			<input type="text" class="form-control" th:id="${id}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'" th:name="${name}" th:placeholder="${label}" th:value="${value}" />
+			<input type="text" class="form-control" th:field="*{__${field}__}" th:id="${id}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'" th:placeholder="${label}" />
 			
 			<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
 		</div>
@@ -20,21 +20,23 @@
 	<!-- / Text -->
 	
 	<!-- Hidden -->
-	<th:block th:fragment="hidden (name, value)">
-		<input type="hidden" th:name="${name}" th:value="${value}">
+	<th:block th:fragment="hidden (field)">
+		<input type="hidden" th:field="*{__${field}__}">
 	</th:block>
 	<!-- / Hidden -->
 	
 	<!-- Select -->
-	<th:block th:fragment="select (label, name, value, dataList)" th:with="id=${name} + '_' + ${randomSuffix}">
+	<th:block th:fragment="select (label, field, name, dataList)" th:with="id=${name} + '_' + ${randomSuffix}, onChangeEvent=${onChangeEvent}, dataList=${dataList}, update=${update} == null ? null : ${update} + '_' + ${randomSuffix}">
 		<div class="col-md-1">
 			<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
 		</div>
 	
 		<div class="col-md-3">
-			<select class="form-select" th:name="${name}" th:value="${value}" role="select">
+			<select class="form-select" th:field="*{__${field}__}" th:id="${id}" th:random-suffix="${randomSuffix}" th:onChangeEvent=${onChangeEvent} th:update="${update}" th:session-attribute="${sessionAttribute}" role="select" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'">
 				<option th:each="entry: ${dataList}" th:data="${entry}" th:value="${entry}" th:text="${entry.label()}"></option>
 			</select>
+			
+			<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
 		</div>
 	</th:block>
 	<!-- / Select -->

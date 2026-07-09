@@ -343,3 +343,43 @@ app.session.datasource.password=secret
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
+----------------
+On Change Value
+----------------
+<th:block th:fragment="select (label, field, name, dataList)" th:with="id=${name} + '_' + ${randomSuffix}, onChangeEvent=${onChangeEvent}, dataList=${dataList}==null ? ${T(com.mpodda.thymeleaf_sample.thymeleaf.SelectionFilterUtils).onValueChange(#ctx)} : ${dataList}">
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+---------
+-- AOP --
+---------
+
+Option 3: Register the advisor programmatically
+
+If you really need the pointcut expression itself to come from application.properties, you can do it programmatically instead of using annotations.
+
+For example:
+
+application.properties
+
+aspect.pointcut=execution(* com.mycompany.service..*(..))
+
+Configuration
+
+@Configuration
+public class AopConfig {
+
+    @Bean
+    public Advisor loggingAdvisor(
+            @Value("${aspect.pointcut}") String expression,
+            MethodInterceptor interceptor) {
+
+        AspectJExpressionPointcut pointcut =
+                new AspectJExpressionPointcut();
+
+        pointcut.setExpression(expression);
+
+        return new DefaultPointcutAdvisor(pointcut, interceptor);
+    }
+}

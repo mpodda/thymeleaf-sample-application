@@ -14,13 +14,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.mpodda.thymeleaf_sample.annotations.FilterialMethod;
-import com.mpodda.thymeleaf_sample.annotations.FilterialPreservations;
 import com.mpodda.thymeleaf_sample.annotations.PersisterialMethod;
+import com.mpodda.thymeleaf_sample.annotations.SelectialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.CountryDto;
-import com.mpodda.thymeleaf_sample.domain.dto.FilterDto;
 import com.mpodda.thymeleaf_sample.service.ContinentFilterService;
 import com.mpodda.thymeleaf_sample.service.ContinentService;
 import com.mpodda.thymeleaf_sample.service.CountryService;
@@ -39,8 +37,6 @@ public class CountriesController extends BaseController {
 	
 	private CountryDtoValidator countryDtoValidator;
 	
-//	private List<CountryDto> countriesList;
-
 	public CountriesController(CountryService countryService, ContinentService continentService,
 			ContinentFilterService continentFilterService, CountryDtoValidator countryDtoValidator) {
 		this.countryService = countryService;
@@ -57,35 +53,32 @@ public class CountriesController extends BaseController {
 	@SessionalDto(sessionAttributeName = "countries")
 	public List<CountryDto> getCountriesList() {
 		return this.countryService.allDto();
-//		return countriesList;
 	}
 	
 	@SessionalMethod(sessionAttributeNames = {"countries"})
 	@GetMapping({"/countries"})
 	public String continents(Model model, HttpSession httpSession) {
-//		this.countriesList = this.countryService.allDto();
-		
 		return "application/countries";
 	}
 	
-	@FilterialPreservations(modelAttributeNames={"country"})
+	@SelectialMethod(preservedSessionAttributeNames = {"object", "filteredContinents"})
 	@GetMapping({"/new-country"})
 	public String newContinent(Model model, HttpSession httpSession) {
-		model.addAttribute("country", this.countryService.dtoDefaultInstance());
-		
+		model.addAttribute("object", this.countryService.dtoDefaultInstance());
 		model.addAttribute("filteredContinents", this.continentService.allDto());
 		
 		return "application/fragments/countries-fragments :: edit-country";
 	}
 	
-	@FilterialPreservations(modelAttributeNames={"country"})
 	@GetMapping({"/edit-country"})
-	public String editContinent(@RequestParam (required = false) Long countryId, Model model, HttpSession httpSession, HttpServletResponse response) {
+	public String editCountry(@RequestParam (required = false) Long countryId, Model model, HttpSession httpSession, HttpServletResponse response) {
 		try {
-			model.addAttribute("country", this.countryService.dtoByEntityId(countryId));
+			model.addAttribute("object", this.countryService.dtoByEntityId(countryId));
 		} catch (Exception e) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 		}
+		
+		model.addAttribute("filteredContinents", this.continentService.allDto());
 		
 		return "application/fragments/countries-fragments :: edit-country";
 	}
@@ -93,15 +86,13 @@ public class CountriesController extends BaseController {
 	@SessionalMethod(sessionAttributeNames = {"countries"})
 	@GetMapping({"/list-countries"})
 	public String listCountries(Model model, HttpSession httpSession) {
-		//this.countriesList = this.countryService.allDto();
-		
 		return "application/fragments/countries-fragments :: countries-list";
 	}
 	
-	@PersisterialMethod(preservedModelAttributeName = "country")
+	@PersisterialMethod(preservedObjectModelAttributeName = "object", preservedModelAttributeNames = {"filteredContinents"})
 	@Transactional
 	@PostMapping({"/save-country"})
-	public String saveCountry(@Validated @ModelAttribute CountryDto modelAttribute, Errors errors, Model model, HttpServletResponse response) {
+	public String saveCountry(@Validated @ModelAttribute CountryDto modelAttribute, Errors errors, Model model, HttpSession httpSession, HttpServletResponse response) {
 		if (!errors.getFieldErrors().isEmpty()) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			model.addAttribute("fieldErrors", errors.getFieldErrors());
@@ -118,14 +109,6 @@ public class CountriesController extends BaseController {
 		}
 		
 		model.addAttribute("filteredContinents", this.continentService.allDto());
-		
-		return "application/fragments/countries-fragments :: edit-country";
-	}
-	
-	@FilterialMethod(preservedModelAttributeNames={"country"})
-	@PostMapping({"/filter-continents"})
-	public String filterContinents(Model model, HttpSession httpSession,  @ModelAttribute FilterDto filterDto, HttpServletResponse response) {
-		model.addAttribute("filteredContinents", this.continentService.fromEntityList(this.continentFilterService.filterByName(filterDto.getValue())));
 		
 		return "application/fragments/countries-fragments :: edit-country";
 	}

@@ -23,7 +23,7 @@ public class ContinentDto extends BaseIdentifiableDto<Continent, ContinentDto> i
 	}
 	
 	@Override
-	public String Id() {
+	public String id() {
 		return this.isNewEntry() ? null : String.valueOf(this.getId());
 	}
 

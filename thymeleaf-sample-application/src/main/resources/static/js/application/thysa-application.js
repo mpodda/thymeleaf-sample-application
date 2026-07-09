@@ -416,7 +416,7 @@ export async function formComponents() {
 				if (isOptionValue(dataListInputElement.value, `${dataListInputElement.id}_datalist`)) {
 					document.getElementById(`${dataListInputElement.id}_hidden`).value = getOptionDataByInputValue(dataListInputElement.value, `${dataListInputElement.id}_datalist`);
 					
-					await intecommunication.onSelectionChange (
+					await intecommunication.onDataListSelectionChange (
 						{
 						"sessionAttribute" : dataListInputElement.getAttribute("session-attribute"),
 						              "id" : dataListInputElement.id,
@@ -478,14 +478,24 @@ export async function formComponents() {
 		
 		for (const selectElement of selectElements) {
 			selectElement.addEventListener("change", async () => {
-				console.info("value", selectElement.value, "selected");
+				await intecommunication.onSelectionChange (
+					{
+						"sessionAttribute" : selectElement.getAttribute("session-attribute"),
+						              "id" : selectElement.id,
+						           "value" : selectElement.value,
+								    "name" : selectElement.name,
+						   "onChangeEvent" : selectElement.getAttribute("onchangeevent"),
+						    "randomSuffix" : selectElement.getAttribute("random-suffix"),
+							      "update" :  selectElement.getAttribute("update")
+					}
+				);
 			});
 		}
 	}	
 	
 	async function init() {
 		await initDatalistInputEvents();
-		
+//		
 		await initSelectEvents();
 	}
 	
@@ -504,7 +514,7 @@ export async function formComponents() {
 
 /*export*/ class Intecommunication {
 	constructor() {
-		this.onDataChange = async () => {};
+		//this.onDataChange = async () => {};
 		
 		this.onDataChange = async (data) => {};
 		
@@ -513,6 +523,8 @@ export async function formComponents() {
 		this.onPopFragment = async (data) => {};
 		
 		this.onDataListInput = async (data) => {};
+		
+		this.onDataListSelectionChange = async (data) => {};
 		
 		this.onSelectionChange = async (data) => {};
 	}

@@ -33,7 +33,7 @@ public class CityService extends IdentifiableEntityAndDtoService<City, CityDto> 
 
 	@Override
 	public CityDto fromEntity(City city) {
-		return new CityDto().name(city.getName()).country(this.countryService.fromEntity(city.getCountry()));
+		return new CityDto().id(city.getId()).name(city.getName()).country(this.countryService.fromEntity(city.getCountry()));
 	}
 
 	@Override

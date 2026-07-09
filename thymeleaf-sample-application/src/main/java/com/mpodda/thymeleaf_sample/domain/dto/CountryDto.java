@@ -27,7 +27,7 @@ public class CountryDto extends BaseIdentifiableDto<Country, CountryDto> impleme
 	}
 
 	@Override
-	public String Id() {
+	public String id() {
 		return this.isNewEntry() ? null : String.valueOf(this.getId());
 	}
 

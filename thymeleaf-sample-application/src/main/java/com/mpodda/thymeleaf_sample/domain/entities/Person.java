@@ -1,6 +1,6 @@
 package com.mpodda.thymeleaf_sample.domain.entities;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -17,8 +17,8 @@ public class Person extends IdentifiableEntity {
 	@Column(name = "p_name")
 	private String name;
 	
-	@Column(name = "p_age")
-	private Integer age;
+//	@Column(name = "p_age")
+//	private Integer age;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="p_couid")
@@ -29,7 +29,37 @@ public class Person extends IdentifiableEntity {
 	private Set<PersonAddress> addresses;
 	
 	@Column(name = "p_date_of_birth")
-	private Date dateOfBirth;
-	
-	
+	private LocalDate dateOfBirth;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public Set<PersonAddress> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(Set<PersonAddress> addresses) {
+		this.addresses = addresses;
+	}
+
+	public LocalDate getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(LocalDate dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
 }

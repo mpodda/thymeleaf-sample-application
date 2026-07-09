@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.mpodda.thymeleaf_sample.domain.dto.ContinentDto;
 import com.mpodda.thymeleaf_sample.domain.dto.CountryDto;
 import com.mpodda.thymeleaf_sample.domain.entities.Continent;
 import com.mpodda.thymeleaf_sample.domain.entities.Country;
 import com.mpodda.thymeleaf_sample.repository.AbstractJpaDao;
 import com.mpodda.thymeleaf_sample.repository.CountryRepository;
 import com.mpodda.thymeleaf_sample.service.implementations.IdentifiableEntityAndDtoService;
+import com.mpodda.thymeleaf_sample.utils.Serializer;
 
 @Service
 public class CountryService extends IdentifiableEntityAndDtoService<Country, CountryDto> {
@@ -78,5 +80,17 @@ public class CountryService extends IdentifiableEntityAndDtoService<Country, Cou
 		);
 		
 		return countriesList;
+	}
+	
+	public List<Country> filterByContinentId(final Long continentId) throws Exception {
+		return this.countryRepository.byContinentId(continentId);
+	}
+	
+	public List<CountryDto> filterByContinent(final ContinentDto continentDto) throws Exception {
+		return this.fromEntityList(this.filterByContinentId(continentDto.getId()));
+	}
+	
+	public List<CountryDto> filterByContinent(final String continentDtoJson) throws Exception {
+		return this.fromEntityList(this.filterByContinentId(Serializer.jsonStringToObject(continentDtoJson, ContinentDto.class).getId()));
 	}
 }

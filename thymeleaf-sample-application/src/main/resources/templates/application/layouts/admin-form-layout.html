@@ -1,4 +1,4 @@
-<html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-form-layout(object, formContent, sessionAttribute)" th:with="randomSuffix = ${randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${randomSuffix}">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-form-layout(formContent, sessionAttribute)" th:with="randomSuffix = ${randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${randomSuffix}">
 	<section role="placeholder">
 		<div class="card text-center">
 			<div class="card-header">
@@ -23,6 +23,15 @@
 					<input type="hidden" name="sessionAttribute" id="sessionAttribute" />
 					<input type="hidden" name="name" id="name" />
 					<input type="hidden" name="value" id="value" />
+					<input type="hidden" name="randomSuffix" id="randomSuffix" th:vale="${randomSuffix}"/>
+				</form>
+				
+				<form role="value-change-form" th:value-change-form-id="'value-change-form-' + ${randomSuffix}" th:action="@{/on-value-change}">
+					<input type="hidden" name="sessionAttribute" id="sessionAttribute" th:value="${sessionAttribute}" />
+					<input type="hidden" name="name" id="name" />
+					<input type="hidden" name="value" id="value" />
+					<input type="hidden" name="event" id="event" />
+					<input type="hidden" name="fragmentUrl" id="fragmentUrl" th:value="${T(com.mpodda.thymeleaf_sample.thymeleaf.FragmentUtils).onValueChangeFormComponentfragmentUrl(#ctx)}"/>
 					<input type="hidden" name="randomSuffix" id="randomSuffix" th:vale="${randomSuffix}"/>
 				</form>
 				

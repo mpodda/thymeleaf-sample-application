@@ -25,6 +25,12 @@ public class CityDto extends BaseIdentifiableDto<City, CityDto> {
 		this.country = country;
 	}
 	
+	public CityDto id(Long id) {
+		this.id = id;
+		
+		return this;
+	}
+	
 	public CityDto name(String name) {
 		this.name = name;
 		
@@ -36,4 +42,6 @@ public class CityDto extends BaseIdentifiableDto<City, CityDto> {
 		
 		return this;
 	}
+	
+	
 }

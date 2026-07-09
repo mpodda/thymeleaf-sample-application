@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.mpodda.thymeleaf_sample.annotations.PersisterialMethod;
+import com.mpodda.thymeleaf_sample.annotations.SelectialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.ContinentDto;
@@ -58,7 +60,7 @@ public class ContinentsController extends BaseController {
 
 	@GetMapping({"/new-continent"})
 	public String newContinent(Model model) {
-		model.addAttribute("continent", this.continentService.dtoDefaultInstance());
+		model.addAttribute("object", this.continentService.dtoDefaultInstance());
 		
 		return "application/fragments/continents-fragments :: edit-continent";
 	}
@@ -66,7 +68,7 @@ public class ContinentsController extends BaseController {
 	@GetMapping({"/edit-continent"})
 	public String editContinent(@RequestParam (required = false) Long continentId, Model model, HttpServletResponse response) {
 		try {
-			model.addAttribute("continent", this.continentService.dtoByEntityId(continentId));
+			model.addAttribute("object", this.continentService.dtoByEntityId(continentId));
 		} catch (Exception e) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 		}
@@ -82,28 +84,10 @@ public class ContinentsController extends BaseController {
 		return "application/fragments/continents-fragments :: continents-list";
 	}
 	
+	@PersisterialMethod(preservedObjectModelAttributeName = "object")
 	@Transactional
 	@PostMapping({"/save-continent"})
-	public String saveContinent(@Validated @ModelAttribute ContinentDto continentDto, Errors errors, Model model, HttpServletResponse response) {
-		
-		/*
-		System.out.println(String.format("%s Field Errors", errors.getFieldErrors().size()));
-		
-		errors.getFieldErrors().forEach (
-			fieldError -> {
-				System.out.println(String.format("Error saving Continent: %s", getMessage(fieldError.getCode())));
-				System.out.println(String.format("%s arguments : ", fieldError.getArguments().length));
-				
-				for (int i=0; i<fieldError.getArguments().length; i++) {
-					System.out.println(String.format("%s. %s", i+1, fieldError.getArguments()[i]));
-				}
-			}
-		);
-		
-		System.out.println(String.format("continentDto: %s", continentDto));
-		*/
-		
-		
+	public String saveContinent(@Validated @ModelAttribute ContinentDto continentDto, Errors errors, Model model, HttpSession httpSession, HttpServletResponse response) {
 		if (!errors.getFieldErrors().isEmpty()) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			model.addAttribute("fieldErrors", errors.getFieldErrors());

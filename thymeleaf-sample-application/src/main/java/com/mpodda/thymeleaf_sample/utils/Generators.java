@@ -17,7 +17,7 @@ public final class Generators {
 		return RandomStringUtils.insecure().next(stringLength, latinLetters);
 	}
 	
-	public static Date nextDate() {
+	public static LocalDate nextDate() {
 		final int thisYear = LocalDate.now().getYear();
 		
 		final int year = new Random().nextInt((thisYear - 90), (thisYear - 1));
@@ -45,6 +45,8 @@ public final class Generators {
 		
 		final LocalDate randomDate = LocalDate.of(year, month, day);
 		
-		return Date.from(randomDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		//return Date.from(randomDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		
+		return randomDate;
 	}
 }

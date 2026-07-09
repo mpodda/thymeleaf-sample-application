@@ -15,9 +15,18 @@ export class CitiesAdmin extends AdminBase {
 		this.EditValueRole = "edit-city";
 	}
 	
+	
+	/*
 	async selectionChange(data) {
 		console.info("data=", data);
+		
+		switch(data.name) {
+			case "continent" :
+				console.info ("Filter countries by ", data.value);
+			break;
+		}
 	}
+	*/
 	
 	
 	static async getInstance() {

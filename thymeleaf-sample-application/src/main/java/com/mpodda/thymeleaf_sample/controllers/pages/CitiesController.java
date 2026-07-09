@@ -5,24 +5,28 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.mpodda.thymeleaf_sample.annotations.FilterialMethod;
-import com.mpodda.thymeleaf_sample.annotations.FilterialPreservations;
+import com.mpodda.thymeleaf_sample.annotations.PersisterialMethod;
+import com.mpodda.thymeleaf_sample.annotations.SelectialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.CityDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ContinentDto;
 import com.mpodda.thymeleaf_sample.domain.dto.CountryDto;
-import com.mpodda.thymeleaf_sample.domain.dto.FilterDto;
+import com.mpodda.thymeleaf_sample.domain.dto.events.OnValueChangeDto;
 import com.mpodda.thymeleaf_sample.service.CityService;
 import com.mpodda.thymeleaf_sample.service.ContinentService;
-import com.mpodda.thymeleaf_sample.service.CountryFilterService;
 import com.mpodda.thymeleaf_sample.service.CountryService;
+import com.mpodda.thymeleaf_sample.validators.CityDtoValidator;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -33,20 +37,19 @@ public class CitiesController extends BaseController {
 	private CountryService countryService;
 	private CityService cityService;
 	
-	private CountryFilterService countryFilterService;
+	private CityDtoValidator cityDtoValidator;
 
-	
 	public CitiesController(ContinentService continentService, CountryService countryService, CityService cityService,
-			CountryFilterService countryFilterService) {
+			CityDtoValidator cityDtoValidator) {
 		this.continentService = continentService;
 		this.countryService = countryService;
 		this.cityService = cityService;
-		this.countryFilterService = countryFilterService;
+		this.cityDtoValidator = cityDtoValidator;
 	}
 
 	@Override
 	protected void addValidators(WebDataBinder binder) {
-
+		binder.addValidators(this.cityDtoValidator);
 	}
 	
 	@SessionalDto(sessionAttributeName = "cities")
@@ -60,16 +63,17 @@ public class CitiesController extends BaseController {
 		return "application/cities";
 	}
 	
-	@FilterialPreservations(modelAttributeNames={"city"})
+	
+	@SelectialMethod(preservedSessionAttributeNames = {"object", "filteredContinents", "filteredCountries"})
 	@GetMapping({"/new-city"})
 	public String newCity(Model model, HttpSession httpSession, HttpServletResponse response) {
-		model.addAttribute("city", this.cityService.dtoDefaultInstance());
+		model.addAttribute("object", this.cityService.dtoDefaultInstance());
 		
 		final List<ContinentDto> continentsList = continentService.allDto();
-		
 		model.addAttribute("filteredContinents", continentsList);
+		
 		try {
-			model.addAttribute("filteredCountries", continentsList.isEmpty() ? new ArrayList<CountryDto>(0) :  this.countryService.fromEntityList(this.countryFilterService.filterByContinent(continentsList.get(0))));
+			model.addAttribute("filteredCountries", continentsList.isEmpty() ? new ArrayList<CountryDto>(0) :  this.countryService.filterByContinent(continentsList.get(0)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -77,6 +81,49 @@ public class CitiesController extends BaseController {
 		
 		return "application/fragments/cities-fragments :: edit-city";
 	}
+	
+	@GetMapping({"/edit-city"})
+	public String editCity(@RequestParam (required = false) Long cityId, Model model, HttpSession httpSession, HttpServletResponse response) {
+		try {
+			final CityDto cityDto = this.cityService.dtoByEntityId(cityId);
+			model.addAttribute("object", cityDto);
+			
+			model.addAttribute("filteredContinents", continentService.allDto());
+			
+			if (cityDto.getCountry() != null && cityDto.getCountry().getContinent() != null) {
+				model.addAttribute("filteredCountries", this.countryService.filterByContinent(cityDto.getCountry().getContinent()));	
+			} else {
+				model.addAttribute("filteredCountries", new ArrayList<CountryDto>(0));
+			}
+		} catch (Exception e) {
+			response.setStatus(HttpStatus.BAD_REQUEST.value());
+		}
+		
+		return "application/fragments/cities-fragments :: edit-city";
+	}
+	
+	@PersisterialMethod(preservedObjectModelAttributeName = "object", preservedModelAttributeNames= {"filteredContinents", "filteredCountries"})
+	@Transactional
+	@PostMapping({"/save-city"})
+	public String saveCity(@Validated @ModelAttribute CityDto modelAttribute, Errors errors, Model model, HttpSession httpSession, HttpServletResponse response) {
+		if (!errors.getFieldErrors().isEmpty()) {
+			response.setStatus(HttpStatus.BAD_REQUEST.value());
+			model.addAttribute("fieldErrors", errors.getFieldErrors());
+		} else {
+			try {
+				modelAttribute = this.cityService.saveFromDto(modelAttribute);
+			} catch (Exception e) {
+				response.setStatus(HttpStatus.BAD_REQUEST.value());
+				e.printStackTrace();
+			}
+			response.setStatus(HttpStatus.OK.value());
+		}
+
+		model.addAttribute("object", modelAttribute);
+		
+		return "application/fragments/cities-fragments :: edit-city";
+	}
+	
 	
 	@SessionalMethod(sessionAttributeNames = {"cities"})
 	@GetMapping({"/list-cities"})
@@ -84,18 +131,12 @@ public class CitiesController extends BaseController {
 		return "application/fragments/cities-fragments :: cities-list";
 	}
 	
-	@FilterialMethod(preservedModelAttributeNames={"city"})
-	@PostMapping({"/filter-countries"})
-	public String filterCountries(Model model, HttpSession httpSession, @ModelAttribute FilterDto<ContinentDto> filterDto, HttpServletResponse response) {
-		try {
-			model.addAttribute("filteredCountries", this.countryService.fromEntityList(this.countryFilterService.filterByContinent(filterDto.getDto())));
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.setStatus(HttpStatus.BAD_REQUEST.value());
-		}
+	@SelectialMethod(preservedModelAttributeNames = {"object", "filteredContinents"})
+	@PostMapping("/on-continet-value-change")
+	public String onContinentValueChange(Model model, HttpSession httpSession, @ModelAttribute OnValueChangeDto onValueChangeDto) throws Exception {
+		model.addAttribute("filteredCountries", this.countryService.filterByContinent(onValueChangeDto.getValue()));
+		model.addAttribute("randomSuffix", onValueChangeDto.getRandomSuffix());
 		
-		response.setStatus(HttpStatus.OK.value());
-		
-		return "application/fragments/cities-fragments :: edit-city";
+		return onValueChangeDto.getFragmentUrl();
 	}
 }
