@@ -19,7 +19,6 @@ import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingAndSortingDto;
 import com.mpodda.thymeleaf_sample.domain.enums.PagingAndSortingConstants;
 import com.mpodda.thymeleaf_sample.domain.enums.SessionalConstants;
-import com.mpodda.thymeleaf_sample.utils.Serializer;
 import com.mpodda.thymeleaf_sample.web.PagingAndSortingService;
 
 import jakarta.servlet.http.HttpSession;
@@ -30,6 +29,10 @@ public class PagingAndSortingController<Dto extends BaseDto> {
 	@SuppressWarnings("rawtypes")
 	@Autowired
     private FindByIndexNameSessionRepository sessionRepository;
+	
+//	@Autowired
+//	private SessionRepository<?> sessionRepository;
+	
 
 	@Autowired
 	private PagingAndSortingService<Dto> pagingAndSortingService;

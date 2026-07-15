@@ -1,4 +1,5 @@
-package com.mpodda.thymeleaf_sample.aspects;
+package com.mpodda.thymeleaf_sample.aspects.advices;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -6,16 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.aopalliance.aop.Advice;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.stereotype.Component;
@@ -31,10 +28,9 @@ import com.mpodda.thymeleaf_sample.web.PagingAndSortingService;
 
 import jakarta.servlet.http.HttpSession;
 
-//@Aspect
-//@Component
-public class SessionalAspectService <Dto extends BaseDto> /*implements Advice*/ {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SessionalAspectService.class);
+@Component
+public class SessionalAfterReturningAdvice<Dto extends BaseDto> implements AfterReturningAdvice {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SessionalAfterReturningAdvice.class);
 	
 	@Value("${tsa.page-size}")
 	private int pageSize; 
@@ -43,24 +39,25 @@ public class SessionalAspectService <Dto extends BaseDto> /*implements Advice*/ 
 	@Autowired
     private FindByIndexNameSessionRepository sessionRepository;
 	
+//	@Autowired
+//	private JdbcIndexedSessionRepository sessionRepository;
+//	private SessionRepository<?> sessionRepository;
+	
 	@Autowired
 	private PagingAndSortingService<Dto> pagingAndSortingService;
 
-	@Pointcut("within(com.mpodda.thymeleaf_sample.controllers.pages..*)")
-	private void anyPageControllerExecution() {
-		
-	}
-	
-	@SuppressWarnings({"unchecked", "null"})
-	@After ("anyPageControllerExecution()  && args(model, httpSession,..)")
-	public void afterPageControllerExecution(JoinPoint joinPoint, Model model, HttpSession httpSession) {
-		final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-		
-		/* Is 'Sessional' Controller Method */
-		final boolean isSessionalMethod = (methodSignature.getMethod().getAnnotation(SessionalMethod.class) != null);
-		
-		if (isSessionalMethod) {
-			final String[] sessionAttributeNames = methodSignature.getMethod().getAnnotation(SessionalMethod.class).sessionAttributeNames();
+	@SuppressWarnings({ "null", "unchecked" })
+	@Override
+	public void afterReturning(@Nullable Object returnValue, Method method, Object[] args, @Nullable Object target)throws Throwable {
+		if (AdviceUtils.isSessionalMethod(method)) {
+			Model model = AdviceUtils.locateModel(args); 
+			HttpSession httpSession = AdviceUtils.locateHttpSession(args);
+			
+			if (model == null || httpSession == null) {
+				return;
+			}
+			
+			final String[] sessionAttributeNames = method.getAnnotation(SessionalMethod.class).sessionAttributeNames();
 			
 			/* Map that be stored in this session */
 			Map<String, List<Dto>> sessionMap = null;
@@ -87,26 +84,28 @@ public class SessionalAspectService <Dto extends BaseDto> /*implements Advice*/ 
 				}
 			}
 			
-			for (int i=0; i<methodSignature.getDeclaringType().getMethods().length; i++) {
-				final boolean isSessionalDtoMethod = methodSignature.getDeclaringType().getMethods()[i].getAnnotation(SessionalDto.class) != null;
+			final Method[] declaringClassMethods = method.getDeclaringClass().getMethods();
+			
+			for (int i=0; i</*method.getDeclaringClass().getMethods()*/declaringClassMethods.length; i++) {
+				final boolean isSessionalDtoMethod = method.getDeclaringClass().getMethods()[i].getAnnotation(SessionalDto.class) != null;
 				
 				/* Method is 'Sessional' Dto method (Usually 'getter') */
 				if (isSessionalDtoMethod) {
 					/* Session Attribute Name */
-					final String sessionAttributeName = methodSignature.getDeclaringType().getMethods()[i].getAnnotation(SessionalDto.class).sessionAttributeName();
+					final String sessionAttributeName = /*method.getDeclaringClass().getMethods()*/declaringClassMethods[i].getAnnotation(SessionalDto.class).sessionAttributeName();
 					
 					/* Attribute belongs to given 'Sessional' method */
 					final boolean isSessionalAttributeOfThisSessionalMethod = Arrays.stream(sessionAttributeNames).anyMatch(s -> s.equals(sessionAttributeName));					
 					
 					if (isSessionalAttributeOfThisSessionalMethod) {
-						final Method method = methodSignature.getDeclaringType().getMethods()[i];
+						final Method sessionalDtoMethod = /*method.getDeclaringClass().getMethods()*/declaringClassMethods[i];
 						
 						try {
 							/* Get Data */
-							List<Dto> data = (List<Dto>)method.invoke(joinPoint.getTarget());
+							List<Dto> data = (List<Dto>)sessionalDtoMethod.invoke(target);
 							
 							/* Are data should be paged ? */
-							final boolean paging = methodSignature.getDeclaringType().getMethods()[i].getAnnotation(SessionalDto.class).paging();
+							final boolean paging = /*method.getDeclaringClass().getMethods()*/declaringClassMethods[i].getAnnotation(SessionalDto.class).paging();
 							
 							/* Paging case */
 							if (paging) {
@@ -134,7 +133,7 @@ public class SessionalAspectService <Dto extends BaseDto> /*implements Advice*/ 
 			if (!sessionMap.isEmpty()) {
 				session.setAttribute(SessionalConstants.DATA.value(), sessionMap);
 				this.sessionRepository.save(session);
-			}
+			}			
 		}
 	}
 }

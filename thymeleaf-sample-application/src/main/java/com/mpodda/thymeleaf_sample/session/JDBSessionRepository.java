@@ -6,7 +6,7 @@ import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+//@Repository
 public class JDBSessionRepository implements SessionRepository<Session> {
 	@Autowired
 	JdbcTemplate jdbcTemplate;

@@ -18,8 +18,8 @@ import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class PersisterialPreservationAspectService <Dto extends BaseDto> {
 
 	@Pointcut("within(com.mpodda.thymeleaf_sample.controllers.pages..*)")

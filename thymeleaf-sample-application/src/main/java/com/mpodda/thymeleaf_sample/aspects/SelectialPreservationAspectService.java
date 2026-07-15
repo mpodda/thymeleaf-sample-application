@@ -17,15 +17,9 @@ import com.mpodda.thymeleaf_sample.domain.dto.events.OnValueChangeDto;
 
 import jakarta.servlet.http.HttpSession;
 
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class SelectialPreservationAspectService {
-
-    private final ContinentDtoConverter continentDtoConverter;
-
-    SelectialPreservationAspectService(ContinentDtoConverter continentDtoConverter) {
-        this.continentDtoConverter = continentDtoConverter;
-    }
 	@Pointcut("within(com.mpodda.thymeleaf_sample.controllers.pages..*)")
 	private void anyPageControllerExecution() {
 		

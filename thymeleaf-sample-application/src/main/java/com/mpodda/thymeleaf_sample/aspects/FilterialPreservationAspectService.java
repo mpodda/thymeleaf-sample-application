@@ -18,8 +18,8 @@ import com.mpodda.thymeleaf_sample.domain.dto.FilterDto;
 
 import jakarta.servlet.http.HttpSession;
 
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class FilterialPreservationAspectService <Dto extends BaseIdentifiableDto<?, ?>> {
 	@Pointcut("within(com.mpodda.thymeleaf_sample.controllers.pages..*)")
 	private void anyPageControllerExecution() {

@@ -3,7 +3,7 @@ package com.mpodda.thymeleaf_sample.session;
 import org.springframework.session.jdbc.JdbcIndexedSessionRepository;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public class JdbcSessionService {
 	private JdbcIndexedSessionRepository sessionRepository;
 
