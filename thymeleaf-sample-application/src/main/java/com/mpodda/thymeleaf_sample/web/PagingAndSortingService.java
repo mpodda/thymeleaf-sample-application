@@ -9,22 +9,22 @@ import org.springframework.stereotype.Service;
 
 import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ps.PageNumberDto;
-import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingAndSortingDto;
+import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingSortingAndFilteringDto;
 import com.mpodda.thymeleaf_sample.domain.enums.PagingAndSortingConstants;
 
 @Service
 public final class PagingAndSortingService<Dto extends BaseDto> {
-	@Value("${tsa.page-size}")
+	@Value("${thysa.page-size}")
 	private int pageSize;
 	
-	@Value("${tsa.max-number-of-pages}")
+	@Value("${thysa.max-number-of-pages}")
 	private int maxNumberOfPages;
 	
-	@Value("${tsa.number-of-limits-pages}")
+	@Value("${thysa.number-of-limits-pages}")
 	private int numberOfLimitsPages;
 
 	@SuppressWarnings("null")
-	public PagingAndSortingDto pagingSetup(PagingAndSortingDto pagingAndSortingDto, final List<Dto> data) {
+	public PagingSortingAndFilteringDto pagingSetup(PagingSortingAndFilteringDto pagingAndSortingDto, final List<Dto> data) {
 		PagedListHolder<Dto> pagedListHolder = new PagedListHolder<Dto>(data);
 		pagedListHolder.setPageSize(this.pageSize);
 		pagedListHolder.setPage(PagingAndSortingConstants.DEFAULT_PAGE.intValue());
@@ -47,7 +47,7 @@ public final class PagingAndSortingService<Dto extends BaseDto> {
 		return pagingAndSortingDto;
 	}
 	
-	public PagingAndSortingDto updatePagingData(PagingAndSortingDto pagingAndSortingDto, final PagedListHolder<Dto> pagedListHolder) {
+	public PagingSortingAndFilteringDto updatePagingData(PagingSortingAndFilteringDto pagingAndSortingDto, final PagedListHolder<Dto> pagedListHolder) {
 		pagingAndSortingDto.setPageOffset(pagedListHolder.getPageSize());
 		pagingAndSortingDto.setPageNumber(pagedListHolder.getPage() + 1);
 		pagingAndSortingDto.setNumberOfPages(pagedListHolder.getPageCount());
@@ -130,7 +130,7 @@ public final class PagingAndSortingService<Dto extends BaseDto> {
 	}
 	
 	
-	private static List<PageNumberDto> definePageNumbers(final PagingAndSortingDto pagingAndSortingDto, final int maxNumberOfPages) {
+	private static List<PageNumberDto> definePageNumbers(final PagingSortingAndFilteringDto pagingAndSortingDto, final int maxNumberOfPages) {
 		List<PageNumberDto> pageNumbersList = new ArrayList<PageNumberDto>(pagingAndSortingDto.getNumberOfPages() < maxNumberOfPages ? pagingAndSortingDto.getNumberOfPages() : maxNumberOfPages);
 		
 		List<Integer> allPageNumbers = new ArrayList<Integer>(pagingAndSortingDto.getNumberOfPages());

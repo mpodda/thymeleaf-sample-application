@@ -1,3 +1,4 @@
+/*
 import {ContinentsAdmin as ContinentsAdmin} from './ContinentsAdmin.js';
 
 (async () => {
@@ -8,3 +9,4 @@ import {ContinentsAdmin as ContinentsAdmin} from './ContinentsAdmin.js';
 	
 	await init();
 })();
+*/

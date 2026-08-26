@@ -1,4 +1,4 @@
-package com.mpodda.thymeleaf_sample.annotations;
+package com.mpodda.thymeleaf_sample.annotations.administration;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface FilterialMethod {
-	String[] preservedModelAttributeNames() default {};
+@Target(ElementType.TYPE)
+public @interface AdminController {
+	String  sessionAttribute();
+	String reference();
 }

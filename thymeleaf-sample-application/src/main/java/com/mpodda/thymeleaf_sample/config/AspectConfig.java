@@ -9,8 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.lang.NonNull;
 
-import com.mpodda.thymeleaf_sample.aspects.advices.FilterialPreservationAfterReturningAdvice;
-import com.mpodda.thymeleaf_sample.aspects.advices.FilterialPreservationMethodBeforeAdvive;
+import com.mpodda.thymeleaf_sample.aspects.advices.PersisterialPreservationAfterReturningAdvice;
 import com.mpodda.thymeleaf_sample.aspects.advices.SelectialPreservationAfterReturningAdvice;
 import com.mpodda.thymeleaf_sample.aspects.advices.SessionalAfterReturningAdvice;
 
@@ -43,7 +42,7 @@ public class AspectConfig {
 	}
 	
 	@Bean
-	Advisor FilterialPreservationMethodBeforeAspectServiceAdvisor (@Value("${aspect.page-controllers.pointcut}") String expression, @NonNull FilterialPreservationMethodBeforeAdvive<?> advice) {
+	Advisor PersisterialPreservationAspectServiceAdvisor (@Value("${aspect.page-controllers.pointcut}") String expression, @NonNull PersisterialPreservationAfterReturningAdvice<?> advice) {
 	    AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
 	    pointcut.setExpression(expression);
 	
@@ -53,16 +52,4 @@ public class AspectConfig {
 		
 	    return defaultPointcutAdvisor;
 	}
-	
-	@Bean
-	Advisor FilterialPreservationAfterReturningAspectServiceAdvisor (@Value("${aspect.page-controllers.pointcut}") String expression, @NonNull FilterialPreservationAfterReturningAdvice advice) {
-	    AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
-	    pointcut.setExpression(expression);
-	
-	    DefaultPointcutAdvisor defaultPointcutAdvisor = new DefaultPointcutAdvisor();
-	    defaultPointcutAdvisor.setPointcut(pointcut);
-	    defaultPointcutAdvisor.setAdvice(advice);
-		
-	    return defaultPointcutAdvisor;
-	}	
 }

@@ -14,4 +14,8 @@ public enum SessionalConstants {
 	public String value() {
 		return this.value;
 	}
+	
+	public String modelAttributeValue(String sessionAttribute) {
+		return PAGING_AND_SORTING_MODEL_ATTRIBUTE.value() + "_" + sessionAttribute;
+	}
 }

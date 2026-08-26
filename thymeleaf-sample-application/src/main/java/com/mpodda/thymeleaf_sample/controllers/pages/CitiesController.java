@@ -22,7 +22,6 @@ import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.CityDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ContinentDto;
 import com.mpodda.thymeleaf_sample.domain.dto.CountryDto;
-import com.mpodda.thymeleaf_sample.domain.dto.events.OnValueChangeDto;
 import com.mpodda.thymeleaf_sample.service.CityService;
 import com.mpodda.thymeleaf_sample.service.ContinentService;
 import com.mpodda.thymeleaf_sample.service.CountryService;
@@ -39,8 +38,7 @@ public class CitiesController extends BaseController {
 	
 	private CityDtoValidator cityDtoValidator;
 
-	public CitiesController(ContinentService continentService, CountryService countryService, CityService cityService,
-			CityDtoValidator cityDtoValidator) {
+	public CitiesController(ContinentService continentService, CountryService countryService, CityService cityService, CityDtoValidator cityDtoValidator) {
 		this.continentService = continentService;
 		this.countryService = countryService;
 		this.cityService = cityService;
@@ -82,6 +80,7 @@ public class CitiesController extends BaseController {
 		return "application/fragments/cities-fragments :: edit-city";
 	}
 	
+	@SelectialMethod(preservedSessionAttributeNames = {"object", "filteredContinents", "filteredCountries"})
 	@GetMapping({"/edit-city"})
 	public String editCity(@RequestParam (required = false) Long cityId, Model model, HttpSession httpSession, HttpServletResponse response) {
 		try {
@@ -131,12 +130,13 @@ public class CitiesController extends BaseController {
 		return "application/fragments/cities-fragments :: cities-list";
 	}
 	
-	@SelectialMethod(preservedModelAttributeNames = {"object", "filteredContinents"})
-	@PostMapping("/on-continet-value-change")
-	public String onContinentValueChange(Model model, HttpSession httpSession, @ModelAttribute OnValueChangeDto onValueChangeDto) throws Exception {
-		model.addAttribute("filteredCountries", this.countryService.filterByContinent(onValueChangeDto.getValue()));
-		model.addAttribute("randomSuffix", onValueChangeDto.getRandomSuffix());
-		
-		return onValueChangeDto.getFragmentUrl();
-	}
+//	@SelectialMethod(preservedModelAttributeNames = {"object", "filteredContinents"})
+//	@PostMapping("/on-continet-value-change")
+//	public String onContinentValueChange(Model model, HttpSession httpSession, @ModelAttribute OnValueChangeDto onValueChangeDto) throws Exception {
+//		model.addAttribute("filteredCountries", this.countryService.filterByContinent(onValueChangeDto.getValue()));
+//		
+//		//model.addAttribute("randomSuffix", onValueChangeDto.getRandomSuffix());
+//		
+//		return onValueChangeDto.getFragmentUrl();
+//	}
 }

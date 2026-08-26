@@ -12,7 +12,7 @@
 	<artifactId>thymeleaf-sample-application</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>thymeleaf-sample-application</name>
-	<description>Sample Application using Thymeleaf anf Ajax</description>
+	<description>Sample Application using Thymeleaf and Ajax</description>
 	<url/>
 	<licenses>
 		<license/>

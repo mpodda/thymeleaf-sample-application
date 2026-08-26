@@ -13,8 +13,8 @@
 					<table class="table table-hover" th:fragment="gridContent">
 						<thead>
 							<tr>
-								<th th:replace="~{application/components/table-components :: column-header('Id', 'id')}"></th>
-								<th th:replace="~{application/components/table-components :: column-header('Name', 'name')}"></th>
+								<th th:replace="~{application/components/table-components :: column-header(text='Id', sortField='id', filter=true, filterOperation='EXACT')}"></th>
+								<th th:replace="~{application/components/table-components :: column-header(text='Name', sortField='name', filter=true)}"></th>
 								<th></th>
 							</tr>
 						</thead>

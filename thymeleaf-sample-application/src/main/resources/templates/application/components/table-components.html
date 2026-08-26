@@ -44,28 +44,45 @@
 						<li class="page-item" th:classappend="${isLastPage} ? 'disabled' : ''"><button role="page-link" aria-current="page" th:data-page-number="${pagingAndSortingDto.get(sessionAttribute).numberOfPages}" class="page-link">&raquo;</button></li>
 						<!-- / Navigation too next and last page  -->
 					</ul>					
-				</nav>				
+				</nav>
 			</section>
 		</th:block>
 
-		<form th:grid-form-id="'grid-form-' + ${randomSuffix}" th:action="@{/paging-sort}">
-			<input type="hidden" name="currentSortField" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortField}" />
-			<input type="hidden" name="currentSortDirection" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortDirection}" />
-			<input type="hidden" name="randomSuffix" th:value="${pagingAndSortingDto.get(sessionAttribute).randomSuffix == null ? randomSuffix : pagingAndSortingDto.get(sessionAttribute).randomSuffix}" />
-			<input type="hidden" name="viewName" th:value="${currentUrl}" />
-			<input type="hidden" name="fragmentUrl" th:value="${T(com.mpodda.thymeleaf_sample.thymeleaf.FragmentUtils).fragmentUrl(#ctx)}" />
-			<input type="hidden" name="sessionAttribute" th:value="${pagingAndSortingDto.get(sessionAttribute).sessionAttribute == null ? sessionAttribute : pagingAndSortingDto.get(sessionAttribute).sessionAttribute}" />
-			<input type="hidden" name="pageNumber" th:value="${pagingAndSortingDto.get(sessionAttribute).pageNumber == null ? 1 : pagingAndSortingDto.get(sessionAttribute).pageNumber}" />
-<!-- 			<input type="hidden" name="pageNumber" th:value="${2}" /> -->
-		</form>
-		
+		<th:block>
+			<form th:grid-form-id="'grid-form-' + ${randomSuffix}" th:action="@{/paging-sort}" th:with="filters = ${pagingAndSortingDto.get(sessionAttribute).filters}">
+				<input type="hidden" name="currentSortField" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortField}" />
+				<input type="hidden" name="currentSortDirection" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortDirection}" />
+				<input type="hidden" name="randomSuffix" th:value="${pagingAndSortingDto.get(sessionAttribute).randomSuffix == null ? randomSuffix : pagingAndSortingDto.get(sessionAttribute).randomSuffix}" />
+				<input type="hidden" name="viewName" th:value="${currentUrl}" />
+				<input type="hidden" name="fragmentUrl" th:value="${T(com.mpodda.thymeleaf_sample.thymeleaf.FragmentUtils).fragmentUrl(#ctx)}" />
+				<input type="hidden" name="sessionAttribute" th:value="${pagingAndSortingDto.get(sessionAttribute).sessionAttribute == null ? sessionAttribute : pagingAndSortingDto.get(sessionAttribute).sessionAttribute}" />
+				<input type="hidden" name="pageNumber" th:value="${pagingAndSortingDto.get(sessionAttribute).pageNumber == null ? 1 : pagingAndSortingDto.get(sessionAttribute).pageNumber}" />
+				
+				<th:block th:each="filter, iterator:${filters}">
+					<input type="hidden" th:name="${'filters[' + iterator.index + '].filterField'}" th:value="${filter.filterField}" />
+					<input type="hidden" th:name="${'filters[' + iterator.index + '].filterValue'}" th:value="${filter.filterValue}" />
+					<input type="hidden" th:name="${'filters[' + iterator.index + '].operator'}" th:value="${filter.operator}" />
+				</th:block>
+			</form>
+		</th:block>
 	</section>
 </th:block>
 
-<th th:fragment="column-header(text, sortField)" scope="col" th:with="sortDirection = (${pagingAndSortingDto.get(sessionAttribute).currentSortField} == ${sortField} ?  ${pagingAndSortingDto.get(sessionAttribute).currentSortDirection} : '')" th:sort-field="${sortField}" th:data-type="${dataType}" style="cursor: pointer;">
-	<span th:text="${text}"></span>
-	<th:block th:insert="~{ :: sort(sortDirection=${sortDirection})}"></th:block>
-</th>
+<th:block th:fragment="column-header(text, sortField)" th:with="filter = ${filter} == null ? false : ${filter}, filterOperation = ${filterOperation} == null ? 'CONTAINS' :  ${filterOperation}, sortDirection = (${pagingAndSortingDto.get(sessionAttribute).currentSortField} == ${sortField} ?  ${pagingAndSortingDto.get(sessionAttribute).currentSortDirection} : '')">
+	<th scope="col">
+		<span role="sort-column" th:sort-field="${sortField}" th:data-type="${dataType}" style="cursor: pointer;">
+			<th:block th:insert="~{ :: sort(sortDirection=${sortDirection})}"></th:block>
+			<span th:text="${text}"></span>
+		</span>
+		
+		<th:block th:if="${filter == true}">
+			<th:block th:with="index = ${T(com.mpodda.thymeleaf_sample.thymeleaf.FilterUtils).addFilterField(#ctx, sessionAttribute, sortField, filterOperation)}">
+				<th:block th:insert="~{ :: filter(${sortField}, ${index})}"></th:block>
+			</th:block>
+			
+		</th:block>
+	</th>
+</th:block>
 
 <th:block th:fragment="sort" th:with="sortDirection=${sortDirection}">
 	<th:block th:if="${sortDirection == 'asc'}">
@@ -83,6 +100,10 @@
 	<th:block th:unless="${sortDirection}">
 		<span class="fa-solid fa-sort">&nbsp;</span>
 	</th:block>
+</th:block>
+
+<th:block th:fragment="filter(field, index)">
+	<span><input type="text" size="10" maxlength="20" style="margin-right: 0.5rem;" role="filter" th:session-attribute="${sessionAttribute}" th:filter-field="${field}" th:filter-field-index="${index}" /></span><span><i class="fa-solid fa-filter"></i></span>
 </th:block>
 
 <body>

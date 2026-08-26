@@ -1,7 +1,5 @@
 package com.mpodda.thymeleaf_sample.thymeleaf;
 
-import java.util.List;
-
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IEngineContext;
 import org.thymeleaf.engine.TemplateData;
@@ -24,6 +22,10 @@ public final class FragmentUtils {
 		 final TemplateData fragmentTemplateData = engineContext.getTemplateStack().get(0);
 		 
 		 return new StringBuilder(fragmentTemplateData.getTemplate()).append(" :: ").append(fragmentTemplateData.getTemplateSelectors().iterator().next()).toString();
+	 }
+	 
+	 public static void javascript(IContext context) {
+		 System.out.println("javascript");
 	 }
 }
  

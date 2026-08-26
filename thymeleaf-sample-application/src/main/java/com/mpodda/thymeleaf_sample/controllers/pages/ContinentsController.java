@@ -15,9 +15,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mpodda.thymeleaf_sample.annotations.PersisterialMethod;
-import com.mpodda.thymeleaf_sample.annotations.SelectialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.AddValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.AdminController;
+import com.mpodda.thymeleaf_sample.annotations.administration.AdminIdParameter;
+import com.mpodda.thymeleaf_sample.annotations.administration.EditValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.ListValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.SaveValueMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.ContinentDto;
 import com.mpodda.thymeleaf_sample.service.ContinentService;
 import com.mpodda.thymeleaf_sample.validators.ContinentDtoValidator;
@@ -25,6 +30,7 @@ import com.mpodda.thymeleaf_sample.validators.ContinentDtoValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@AdminController(sessionAttribute = "continents", reference = "continent")
 @Controller
 public class ContinentsController extends BaseController {
 	private ContinentService continentService;
@@ -54,10 +60,14 @@ public class ContinentsController extends BaseController {
 	public String continents(Model model, HttpSession httpSession) {
 		this.continentsList = this.continentService.allDto();
 		
+//		FilterDto filterDto = new FilterDto();
+//		model.addAttribute("filterDto", filterDto);
+		
 		return "application/continents";
 	}
 	
-
+	
+	@AddValueMethod
 	@GetMapping({"/new-continent"})
 	public String newContinent(Model model) {
 		model.addAttribute("object", this.continentService.dtoDefaultInstance());
@@ -65,8 +75,9 @@ public class ContinentsController extends BaseController {
 		return "application/fragments/continents-fragments :: edit-continent";
 	}
 	
+	@EditValueMethod
 	@GetMapping({"/edit-continent"})
-	public String editContinent(@RequestParam (required = false) Long continentId, Model model, HttpServletResponse response) {
+	public String editContinent(@AdminIdParameter @RequestParam (required = false) Long continentId, Model model, HttpServletResponse response) {
 		try {
 			model.addAttribute("object", this.continentService.dtoByEntityId(continentId));
 		} catch (Exception e) {
@@ -76,14 +87,20 @@ public class ContinentsController extends BaseController {
 		return "application/fragments/continents-fragments :: edit-continent";
 	}
 	
+	@ListValueMethod
 	@SessionalMethod(sessionAttributeNames = {"continents"})
 	@GetMapping({"/list-continents"})
 	public String listContinents( Model model, HttpSession httpSession) {
 		this.continentsList = this.continentService.allDto();
 		
+//		FilterDto filterDto = new FilterDto();
+//		model.addAttribute("filterDto", filterDto);
+
+		
 		return "application/fragments/continents-fragments :: continents-list";
 	}
 	
+	@SaveValueMethod
 	@PersisterialMethod(preservedObjectModelAttributeName = "object")
 	@Transactional
 	@PostMapping({"/save-continent"})

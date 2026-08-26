@@ -1,7 +1,9 @@
 package com.mpodda.thymeleaf_sample.domain.dto;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.Period;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.mpodda.thymeleaf_sample.domain.entities.Person;
 
@@ -10,10 +12,9 @@ public class PersonDto extends BaseIdentifiableDto<Person, PersonDto> {
 	
 	private String name;
 	
-	private Integer age;
-	
 	private CountryDto country;
 	
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private LocalDate dateOfBirth;
 	
 
@@ -26,11 +27,7 @@ public class PersonDto extends BaseIdentifiableDto<Person, PersonDto> {
 	}
 
 	public Integer getAge() {
-		return age;
-	}
-
-	public void setAge(Integer age) {
-		this.age = age;
+		return this.calculateAge();
 	}
 
 	public LocalDate getDateOfBirth() {
@@ -61,12 +58,6 @@ public class PersonDto extends BaseIdentifiableDto<Person, PersonDto> {
 		return this;
 	}
 	
-	public PersonDto age(Integer age) {
-		this.age = age;
-		
-		return this;
-	}
-	
 	public PersonDto dateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 		
@@ -77,5 +68,13 @@ public class PersonDto extends BaseIdentifiableDto<Person, PersonDto> {
 		this.country = country;
 		
 		return this;
+	}
+	
+	private Integer calculateAge() {
+		if (this.dateOfBirth != null) {
+			return Period.between(dateOfBirth, LocalDate.now()).getYears();
+		}
+		
+		return null;
 	}
 }

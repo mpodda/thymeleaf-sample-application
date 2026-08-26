@@ -22,7 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
-import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingAndSortingDto;
+import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingSortingAndFilteringDto;
 import com.mpodda.thymeleaf_sample.domain.enums.SessionalConstants;
 import com.mpodda.thymeleaf_sample.web.PagingAndSortingService;
 
@@ -32,7 +32,7 @@ import jakarta.servlet.http.HttpSession;
 public class SessionalAfterReturningAdvice<Dto extends BaseDto> implements AfterReturningAdvice {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionalAfterReturningAdvice.class);
 	
-	@Value("${tsa.page-size}")
+	@Value("${thysa.page-size}")
 	private int pageSize; 
 
 	@SuppressWarnings("rawtypes")
@@ -63,7 +63,7 @@ public class SessionalAfterReturningAdvice<Dto extends BaseDto> implements After
 			Map<String, List<Dto>> sessionMap = null;
 			
 			/* Map that should be stored in this Model */
-			Map<String, PagingAndSortingDto> modelMap = (Map<String, PagingAndSortingDto>)model.getAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value());
+			Map<String, PagingSortingAndFilteringDto> modelMap = (Map<String, PagingSortingAndFilteringDto>)model.getAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value());
 		
 			LOGGER.info("Try to get Session from repository with id: {}", httpSession.getId());
 			
@@ -109,7 +109,7 @@ public class SessionalAfterReturningAdvice<Dto extends BaseDto> implements After
 							
 							/* Paging case */
 							if (paging) {
-								PagingAndSortingDto pagingAndSortingDto = new PagingAndSortingDto();
+								PagingSortingAndFilteringDto pagingAndSortingDto = new PagingSortingAndFilteringDto();
 								pagingAndSortingDto = this.pagingAndSortingService.pagingSetup(pagingAndSortingDto, data);
 								modelMap.put(sessionAttributeName, pagingAndSortingDto);
 								model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), modelMap);

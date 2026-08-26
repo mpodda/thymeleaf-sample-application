@@ -13,9 +13,7 @@ export class ContinentsAdmin extends AdminBase {
 		
 		this.AddValueRole = "add-continent";
 		this.EditValueRole = "edit-continent";
-		
 	}
-	
 	
 	async initEvents() {
 		console.info("Init events for Continents Admin");

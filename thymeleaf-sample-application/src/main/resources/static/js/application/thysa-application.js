@@ -200,6 +200,8 @@ class GridComponent {
 	#form = null;
 	#withPagination = true;
 	
+	#filterForm = null;
+	
 	constructor(grid) {
 		this.#grid = grid;
 	}
@@ -216,8 +218,16 @@ class GridComponent {
 		const formCollector = `[grid-form-id="grid-form-${this.#randomSuffix}"]`;
 		this.#form = this.#grid.querySelectorAll(formCollector)[0];
 		
+		/* Filter Form */
+		const filterFormCollector = `[filter-form-id="filter-form-${this.#randomSuffix}"]`;
+		this.#filterForm = this.#grid.querySelectorAll(filterFormCollector)[0];
+
+				
 		/* Sorting */
 		await this.#initSorting();
+		
+		/* Filtering */
+		await this.#initFiltering();
 		
 		/* Paging */
 		if (this.#withPagination) {
@@ -233,7 +243,8 @@ class GridComponent {
 	*/
 	
 	async #applySortEvents(header) {
-		let headers = header.querySelectorAll("th");
+//		let headers = header.querySelectorAll("th");
+		let headers = header.querySelectorAll('[role="sort-column"]');
 		
 		for (const header of headers) {
 			header.addEventListener("click", async () => {
@@ -257,24 +268,37 @@ class GridComponent {
 	
 	async #sort(field) {
 		this.#form.currentSortField.value = field;
-		const httpRequest = await /*this.#app.*/postForm(this.#form, this.#form.getAttribute("action"));
+		const httpRequest = await postForm(this.#form, this.#form.getAttribute("action"));
 		
 		/* Header handling */
 		const header = this.#grid.getElementsByTagName('thead')[0];
 		const newHeader = createHTMLFragmentFromTag(httpRequest.responseText, 'thead');
+		
 		await this.#applySortEvents(newHeader);
 		this.#grid.getElementsByTagName('table')[0].replaceChild(newHeader, header);
 
 		/* Content */
 		await this.#updateSortedContent(httpRequest);
 		
-		/* form value */
-		const newForm = createHTMLFragmentFromTag(httpRequest.responseText, 'form');
-		this.#form.currentSortDirection.value = newForm.currentSortDirection.value;
+		/* Form from HttpRequest */
+		const formFromHttpRequest = createHTMLFragmentFromTag(httpRequest.responseText, 'form');
+		
+		/* Update Sorting Related values */
+		this.#form.currentSortDirection.value = formFromHttpRequest.currentSortDirection.value;
+		
+		/* Update Filtering Related values */
+		//this.#form.filterField.value = formFromHttpRequest.filterField.value;
+		//this.#form.filterValue.value = formFromHttpRequest.filterValue.value;
+		
+		/* Re-Apply Filtering events */
+		this.#applyFilterEvents();
 	}
 	
 	async #initSorting() {
-		let headers = this.#grid.querySelectorAll("th");
+		//let headers = this.#grid.querySelectorAll("th");
+		let headers = this.#grid.querySelectorAll('[role="sort-column"]');
+		
+//		console.info(headers.length ,"headers");
 		
 		for (const header of headers) {
 			header.addEventListener("click", async () => {
@@ -283,6 +307,55 @@ class GridComponent {
 		}
 	}
 	
+
+		
+	/*
+	  ---------------
+	  -- Filtering --
+	  ---------------
+	*/
+
+	async #applyFilterEvents() {
+		let filters = this.#grid.querySelectorAll('[role="filter"]');
+
+		for (const filter of filters) {
+			filter.addEventListener("input", async () => {
+				await this.#filter(filter.getAttribute("filter-field"), filter.value, filter.getAttribute("filter-field-index"));
+			});
+		}
+	}
+	
+	async #filter(field, value, index) {
+		console.info("filter:", "field=", field, "value=", value, "index=", index);
+		
+		const filterValueFieldName = `filters[${index}].filterValue`;
+		
+		this.#form[filterValueFieldName].value = value;
+		
+		//this.#form.filterField.value = field;
+		//this.#form.filterValue.value = value;
+		
+		//this.#filterForm[field].value = value;
+		
+		//this.#form[field].value = value;
+		
+		
+		//const httpRequest = await postForm(this.#filterForm, this.#filterForm.getAttribute("action"));
+		
+		const httpRequest = await postForm(this.#form, this.#form.getAttribute("action"));
+		
+		this.#updateSortedContent (httpRequest);
+		
+		this.#updatePagedContent(httpRequest);
+		
+		await this.#applyPagingEvents();
+		
+	}
+	
+	async #initFiltering() {
+		await this.#applyFilterEvents();
+	}
+		
 	
 	/* 
 	  ------------
@@ -302,7 +375,7 @@ class GridComponent {
 	
 	async #gotoToPage(pageNumber) {
 		this.#form.pageNumber.value = pageNumber;
-		const httpRequest = await /*this.#app.*/postForm(this.#form, this.#form.getAttribute("action"));
+		const httpRequest = await postForm(this.#form, this.#form.getAttribute("action"));
 		
 		await this.#updatePagedContent(httpRequest);
 		
@@ -392,7 +465,6 @@ export let pagingAndSortingBySessionAttribute = async(sessionAttribute) => {
   ---------------------
 */
 
-//export let formComponents = async () => {
 export async function formComponents() {
 	async function initDatalistInputEvents() {
 		const dataListInputElements = document.querySelectorAll('[role="datalist-input"]');
@@ -486,17 +558,31 @@ export async function formComponents() {
 								    "name" : selectElement.name,
 						   "onChangeEvent" : selectElement.getAttribute("onchangeevent"),
 						    "randomSuffix" : selectElement.getAttribute("random-suffix"),
-							      "update" :  selectElement.getAttribute("update")
+							      "update" : selectElement.getAttribute("update")
 					}
 				);
 			});
 		}
-	}	
+	}
+	
+	async function initCalendarEvents() {
+		const calendarElements = document.querySelectorAll('[role="calendar"]');
+		
+		for (const calendarElement of calendarElements) {
+			calendarElement.addEventListener("change", async () => {
+				console.info("date=", calendarElement.value);
+			});
+		}
+		
+		
+	}
 	
 	async function init() {
 		await initDatalistInputEvents();
-//		
+
 		await initSelectEvents();
+		
+		await initCalendarEvents();
 	}
 	
 	await init();
@@ -506,13 +592,39 @@ export async function formComponents() {
 	}
 };
 
+
+
+/*
+  ---------------
+  -- Filtering --
+  ---------------
+*/
+
+/*
+export let filtering = async() => {
+	async function init() {
+		let filters = document.querySelectorAll('[role="filter"]');
+		
+		for (const filter of filters) {
+			filter.addEventListener("input", async () => {
+				console.info("value=", filter.value);
+			});
+		}
+		
+	}
+	
+	await init();
+};
+*/
+
+
 /*
   -----------------------
   -- Intecommunication -- 
   -----------------------
 */
 
-/*export*/ class Intecommunication {
+class Intecommunication {
 	constructor() {
 		//this.onDataChange = async () => {};
 		

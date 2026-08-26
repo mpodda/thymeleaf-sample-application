@@ -60,20 +60,19 @@
 	<!-- / Datalist -->
 	
 	<!-- Calendar -->
-		<th:block th:fragment="calendar (label, name, value)">
-			<table>
-				<tr>
-					<td>
-						<table>
-							<tr>
-								<td><button type="button" class="btn btn-light">&lt;</button></td>
-								<td></td>
-								<td><button type="button" class="btn btn-light">&gt;</button></td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</table>
+		<th:block th:fragment="calendar (label, field, name)" th:with="id=${name} + '_' + ${randomSuffix}">
+		<div class="col-md-1">
+			<label class="form-label" th:for="${id}" th:text="${label} + ': '"></label>
+		</div>
+		<div class="col-md-3">
+			
+				<input type="date" class="form-control" role="calendar" th:random-suffix="${randomSuffix}" th:field="*{__${field}__}" th:id="${id}" th:classappend="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).fieldIsInvalid(#ctx, name)} ? 'is-invalid'" th:placeholder="${label}" />
+				
+				<div class="invalid-feedback" th:text="${T(com.mpodda.thymeleaf_sample.thymeleaf.ValidationUtils).errorMessage(#ctx, name)}"></div>
+				
+				<div class="figure-caption text-start">23/07/2026</div>
+			
+		</div>
 		</th:block>
 	<!-- / Calendar -->
 </body>

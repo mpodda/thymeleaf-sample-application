@@ -5,17 +5,7 @@
 </head>
 	<section th:fragment="content">
 		<h2>This is home</h2>
-		
-		<section id="continets-list" style="width:100%;">
-			<th:block th:insert="~{application/fragments/continents-fragments :: continents-list}"></th:block>
-		</section>
-		
-		<hr />
-		
-		<section id="persons-list" style="width:100%;">
-			<th:block th:insert="~{application/fragments/persons-fragments :: persons-list}"></th:block>
-		</section>
-	</section>
+	</section>	
 	
 	<th:block th:fragment="page-scripts">
 		<script th:src="@{/js/application/home.js}" type="module"></script>

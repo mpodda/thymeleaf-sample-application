@@ -8,7 +8,7 @@ export class PersonsAdmin extends AdminBase {
 		
 		this.AddValueUrl = "/new-person";
 		this.ListValueUrl = "/list-persons";
-		this.SaveValueUrl = "/save-persons";
+		this.SaveValueUrl = "/save-person";
 		this.EditValueUrl = "/edit-person?personId";
 
 		this.AddValueRole = "add-person";

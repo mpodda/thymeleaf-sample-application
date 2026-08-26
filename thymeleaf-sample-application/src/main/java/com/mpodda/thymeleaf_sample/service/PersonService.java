@@ -25,6 +25,7 @@ public class PersonService extends IdentifiableEntityAndDtoService<Person, Perso
 	public PersonDto dtoDefaultInstance() {
 		if (personDto == null) {
 			personDto = new PersonDto();
+			//personDto.setDateOfBirth(LocalDate.now());
 			personDto.setCountry(this.countryService.dtoDefaultInstance());
 		}
 		

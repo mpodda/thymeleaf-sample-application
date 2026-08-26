@@ -22,7 +22,6 @@
             "[[@{/}]]".indexOf(";jsessionid") === -1 ?
                 "[[@{/}]]".length :
                 "[[@{/}]]".indexOf(";jsessionid"));
-        const token = '';
     </script>
     
     <title></title>
@@ -42,10 +41,19 @@
 
 	<script th:src="@{/js/application/pagingAndSorting.js}" type="module"></script>
 	
+	<script th:src="@{/js/application/filtering.js}" type="module"></script>
+	
 	<script th:src="@{/js/application/formComponents.js}" type="module"></script>
 	
 	<!-- Page Scripts -->
 	<th:block th:replace="${page_scripts}"></th:block>
 	<!-- / Page Scripts -->
+	
+	<script type="module"
+        th:inline="javascript"
+        th:with="adminJavascript=${T(com.mpodda.thymeleaf_sample.thymeleaf.JavascriptUtils).adminJavascript(#ctx)}">
+		[(${adminJavascript})]
+	</script>
+	
 </body>
 </html>

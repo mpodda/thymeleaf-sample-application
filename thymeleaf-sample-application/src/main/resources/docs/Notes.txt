@@ -383,3 +383,97 @@ public class AopConfig {
         return new DefaultPointcutAdvisor(pointcut, interceptor);
     }
 }
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Filtering 
+
+th:with="filterValue = ${pagingAndSortingDto.get(sessionAttribute).filterValue} == null ? '' : ${pagingAndSortingDto.get(sessionAttribute).filterValue}"
+
+
+th:value=${filterValue}
+
+
+<input type="hidden" name="filterField" th:value="${pagingAndSortingDto.get(sessionAttribute).filterField}" />
+<input type="hidden" name="filterValue" th:value="${pagingAndSortingDto.get(sessionAttribute).filterValue}" />
+
+
+
+			<th:block th:each="filter, iterator:${pagingAndSortingDto.get(sessionAttribute).filters}">
+				<input type="text" th:name ="${filter.filterField}" th:value="${filter.filterValue}" />
+			</th:block>
+
+
+
+			<th:block th:each="filter, iterator: *{filters}">
+				<input type="text" th:field ="*{filters[__${iterator.index}__]}" />
+			</th:block>		
+
+
+
+---------------
+-- Filtering --
+---------------
+<form th:filter-form-id="'filter-form-' + ${randomSuffix}" th:action="@{/filter}"   th:object="${pagingAndSortingDto[sessionAttribute]}">
+			
+			
+			
+<span>pagingAndSortingDto:</span><span th:text="${sessionAttribute}"></span><div th:text="${pagingAndSortingDto.get(sessionAttribute)}"></div>
+
+
+<input th:each="filter, iterator:${filters}" type="text" th:name="${filter.filterField}" th:value="${filter.filterValue}" />
+
+<input th:each="filter, iterator:${filters}" type="text" th:name="${filter.filterField}" th:field="*{[__${iterator.index}__]}" />
+
+
+th:with="filters = ${pagingAndSortingDto.get(sessionAttribute).filterDto.filters}"
+
+<input th:each="filter, iterator: *{filters}" type="text" th:name="${filter.filterField}" th:field="*{filters[__${iterator.index}__]}" />
+
+<form th:filter-form-id="'filter-form-' + ${randomSuffix}" th:action="@{/filter}" th:with="filters = ${pagingAndSortingDto.get(sessionAttribute).filterDto.filters}">
+	<input type="hidden" name="currentSortField" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortField}" />
+	<input type="hidden" name="currentSortDirection" th:value="${pagingAndSortingDto.get(sessionAttribute).currentSortDirection}" />
+	<input type="hidden" name="randomSuffix" th:value="${pagingAndSortingDto.get(sessionAttribute).randomSuffix == null ? randomSuffix : pagingAndSortingDto.get(sessionAttribute).randomSuffix}" />
+	<input type="hidden" name="viewName" th:value="${currentUrl}" />
+	<input type="hidden" name="fragmentUrl" th:value="${T(com.mpodda.thymeleaf_sample.thymeleaf.FragmentUtils).fragmentUrl(#ctx)}" />
+	<input type="hidden" name="sessionAttribute" th:value="${pagingAndSortingDto.get(sessionAttribute).sessionAttribute == null ? sessionAttribute : pagingAndSortingDto.get(sessionAttribute).sessionAttribute}" />
+	<input type="hidden" name="pageNumber" th:value="${pagingAndSortingDto.get(sessionAttribute).pageNumber == null ? 1 : pagingAndSortingDto.get(sessionAttribute).pageNumber}" />
+	
+	<input th:each="filter, iterator:${filters}" type="text" th:name="${filter.filterField}" th:value="${filter.filterValue}" />
+</form>
+
+		
+<input th:each="filter, iterator:${filters}" type="text" th:name="${filter.filterField}" th:value="${filter.filterValue}" />
+
+
+
+<div><input th:each="filter, iterator:${filters}" type="text"  th:name="${'filters[' + iterator.index + '].filterValue'}" th:value="${iterator.index}" /></div>
+
+
+th:with="dto=${pagingAndSortingDto.get(sessionAttribute)}"
+
+
+
+
+				<input type="text" name="filterDto" size="150" th:value="${pagingAndSortingDto.get(sessionAttribute).filters}" />
+				
+				<div><input th:each="filter, iterator:${filters}" type="text"  th:name="${filter.filterField}" th:value="${filter.filterValue}" /></div>
+
+
+
+<div style="border:1px solid; padding:0.5rem;"><input type="text" name="filters[0].filterField" value="id"><input type="text" name="filters[1].filterField" value="name"></div>
+
+
+<div style="border:1px solid; padding:0.5rem;"><input type="text" name="filters[0].filterValue" value=""><input type="text" name="filters[1].filterValue" value=""></div>
+
+
+
+th:filter-field-index="${T(com.mpodda.thymeleaf_sample.thymeleaf.FilterUtils).getFieldIndex(#ctx, sessionAttribute, sortField)}"
+
+
+<input th:each="filter, iterator:${filters}" type="hidden" th:name="${'filters[' + iterator.index + '].filterField'}" th:value="${filter.filterField}" />
+<input th:each="filter, iterator:${filters}" type="hidden" th:name="${'filters[' + iterator.index + '].filterValue'}" th:value="${filter.filterValue}" />
+<input th:each="filter, iterator:${filters}" type="hidden" th:name="${'filters[' + iterator.index + '].operator'}" th:value="${filter.operator}" />
+
+				

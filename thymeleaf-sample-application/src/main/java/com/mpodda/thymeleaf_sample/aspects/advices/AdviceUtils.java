@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 import org.springframework.ui.Model;
 
-import com.mpodda.thymeleaf_sample.annotations.FilterialPreservations;
+import com.mpodda.thymeleaf_sample.annotations.PersisterialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SelectialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
 
@@ -39,7 +39,9 @@ public final class AdviceUtils {
 		return method.getAnnotation(SelectialMethod.class) != null;
 	}
 	
-	public static boolean isFilterialPreservation(final Method method) {
-		return method.getAnnotation(FilterialPreservations.class) != null;
+	public static boolean isPersisterialPreservation(final Method method) {
+		return method.getAnnotation(PersisterialMethod.class) != null;
 	}
 }
+
+
