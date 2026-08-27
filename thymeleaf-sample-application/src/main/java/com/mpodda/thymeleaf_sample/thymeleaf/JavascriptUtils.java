@@ -1,12 +1,12 @@
 package com.mpodda.thymeleaf_sample.thymeleaf;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.MethodParameter;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -17,6 +17,7 @@ import org.thymeleaf.context.IWebContext;
 
 import com.mpodda.thymeleaf_sample.annotations.administration.AddValueMethod;
 import com.mpodda.thymeleaf_sample.annotations.administration.AdminController;
+import com.mpodda.thymeleaf_sample.annotations.administration.AdminIdParameter;
 import com.mpodda.thymeleaf_sample.annotations.administration.EditValueMethod;
 import com.mpodda.thymeleaf_sample.annotations.administration.ListValueMethod;
 import com.mpodda.thymeleaf_sample.annotations.administration.SaveValueMethod;
@@ -26,8 +27,6 @@ public final class JavascriptUtils {
 		IEngineContext engineContext = (IEngineContext)context;
 		IWebContext webContext = (IWebContext)context;
 		
-		System.out.println(String.format("getRequest.getRequestPath(): %s", webContext.getExchange().getRequest().getRequestPath() ));
-		
 		final RequestMappingHandlerMapping handlerMapping = SpringContextForThymeleaf.getBean(RequestMappingHandlerMapping.class);
 		
 		final Map<RequestMappingInfo, HandlerMethod> mappings = handlerMapping.getHandlerMethods();
@@ -35,19 +34,16 @@ public final class JavascriptUtils {
 		Method[] adminControllerMethods = {};
 		Class<?> adminControllerClass = null;
 		
+		
 		/* Find Admin Controller */
 		for (RequestMappingInfo mapping : mappings.keySet()) {
 			final HandlerMethod handlerMethod = mappings.get(mapping);
 			
 			if (mapping.getDirectPaths().contains(webContext.getExchange().getRequest().getRequestPath())) {
-				System.out.println("request path matched");
-				System.out.println(String.format("Admin Controller Name: %s", handlerMethod.getMethod().getDeclaringClass().getName()));
-				System.out.println(String.format("Has annotation: %s", handlerMethod.getMethod().getDeclaringClass().getAnnotation(AdminController.class) != null ? "Yes" : "No"));
-				
 				if (handlerMethod.getMethod().getDeclaringClass().getAnnotation(AdminController.class) != null) {
 					adminControllerClass = handlerMethod.getMethod().getDeclaringClass();
 					adminControllerMethods = handlerMethod.getMethod().getDeclaringClass().getDeclaredMethods();
-					System.out.println("Admin Controller found");
+					
 					break;
 				}
 			}
@@ -57,7 +53,7 @@ public final class JavascriptUtils {
 			}
 		}
 		
-		List<Method> adminControllerMethodsList = Arrays.asList(adminControllerMethods);
+		List<Method> adminControllerMethodsList =Arrays.asList(adminControllerMethods);
 		
 		if (adminControllerClass != null) {
 			/* Values derived directly from AdminController Class */
@@ -75,6 +71,8 @@ public final class JavascriptUtils {
 			
 			/* Edit Value Role */
 			engineContext.setVariable("editValueRole", "edit-" + adminControllerClass.getAnnotation(AdminController.class).reference());
+			
+			
 			
 			/* Traverse mappings to bind with AdminController Methods */
 			mappings.forEach((mapping, handlerMethod) -> {
@@ -100,20 +98,26 @@ public final class JavascriptUtils {
 					
 					/* Edit Value */
 					if (handlerMethod.getMethodAnnotation(EditValueMethod.class) != null) {
-						engineContext.setVariable("editValueUrl", directPath);
+						StringBuffer editValueUrl = new StringBuffer();
+						
+						editValueUrl.append(directPath);
+						
+						for (MethodParameter methodParameter : handlerMethod.getMethodParameters()) {
+							if (methodParameter.getParameterAnnotation(AdminIdParameter.class) != null) {
+								editValueUrl.append("?").append(methodParameter.getParameter().getName());
+							}
+						}
+						
+						engineContext.setVariable("editValueUrl", editValueUrl.toString());
 					}
 				}
 			});
-
+			
 			TemplateEngine templateEngine = SpringContextForThymeleaf.getBean(TemplateEngine.class);
 			
 			return templateEngine.process("application/js/AdminInstanceTemplate.js", engineContext);
 		}
-		
-		
-		
 		//return "console.info('Hello from JavascriptUtils.adminJavascript !!!')";
-		
 		return "";
 	}
 }

@@ -200,8 +200,6 @@ class GridComponent {
 	#form = null;
 	#withPagination = true;
 	
-	#filterForm = null;
-	
 	constructor(grid) {
 		this.#grid = grid;
 	}
@@ -217,11 +215,6 @@ class GridComponent {
 		/* Form */
 		const formCollector = `[grid-form-id="grid-form-${this.#randomSuffix}"]`;
 		this.#form = this.#grid.querySelectorAll(formCollector)[0];
-		
-		/* Filter Form */
-		const filterFormCollector = `[filter-form-id="filter-form-${this.#randomSuffix}"]`;
-		this.#filterForm = this.#grid.querySelectorAll(filterFormCollector)[0];
-
 				
 		/* Sorting */
 		await this.#initSorting();
@@ -243,7 +236,6 @@ class GridComponent {
 	*/
 	
 	async #applySortEvents(header) {
-//		let headers = header.querySelectorAll("th");
 		let headers = header.querySelectorAll('[role="sort-column"]');
 		
 		for (const header of headers) {
@@ -286,19 +278,25 @@ class GridComponent {
 		/* Update Sorting Related values */
 		this.#form.currentSortDirection.value = formFromHttpRequest.currentSortDirection.value;
 		
-		/* Update Filtering Related values */
-		//this.#form.filterField.value = formFromHttpRequest.filterField.value;
-		//this.#form.filterValue.value = formFromHttpRequest.filterValue.value;
+		/* Update Filter Related values */
+		let currentFilters = this.#grid.querySelectorAll('[role="filter"]');
+		let filterValues = formFromHttpRequest.querySelectorAll('[role="filter-value"]');
+		
+		for (const filterValue of filterValues) {
+			const index = filterValue.getAttribute("filter-value-index");
+			for (const currentFilter of currentFilters) {
+				if (currentFilter.getAttribute("filter-field-index") === index) {
+					currentFilter.value = filterValue.value;
+				}
+			}		
+		}
 		
 		/* Re-Apply Filtering events */
 		this.#applyFilterEvents();
 	}
 	
 	async #initSorting() {
-		//let headers = this.#grid.querySelectorAll("th");
 		let headers = this.#grid.querySelectorAll('[role="sort-column"]');
-		
-//		console.info(headers.length ,"headers");
 		
 		for (const header of headers) {
 			header.addEventListener("click", async () => {
@@ -306,7 +304,6 @@ class GridComponent {
 			});
 		}
 	}
-	
 
 		
 	/*
@@ -332,16 +329,6 @@ class GridComponent {
 		
 		this.#form[filterValueFieldName].value = value;
 		
-		//this.#form.filterField.value = field;
-		//this.#form.filterValue.value = value;
-		
-		//this.#filterForm[field].value = value;
-		
-		//this.#form[field].value = value;
-		
-		
-		//const httpRequest = await postForm(this.#filterForm, this.#filterForm.getAttribute("action"));
-		
 		const httpRequest = await postForm(this.#form, this.#form.getAttribute("action"));
 		
 		this.#updateSortedContent (httpRequest);
@@ -349,7 +336,6 @@ class GridComponent {
 		this.#updatePagedContent(httpRequest);
 		
 		await this.#applyPagingEvents();
-		
 	}
 	
 	async #initFiltering() {

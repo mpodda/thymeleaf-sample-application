@@ -477,3 +477,9 @@ th:filter-field-index="${T(com.mpodda.thymeleaf_sample.thymeleaf.FilterUtils).ge
 <input th:each="filter, iterator:${filters}" type="hidden" th:name="${'filters[' + iterator.index + '].operator'}" th:value="${filter.operator}" />
 
 				
+				
+<script type="module"
+    th:inline="javascript"
+    th:with="adminJavascript=${T(com.mpodda.thymeleaf_sample.thymeleaf.JavascriptUtils).adminJavascript(#ctx)}">
+	[(${adminJavascript})]
+</script>

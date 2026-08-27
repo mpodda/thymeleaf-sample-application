@@ -50,10 +50,10 @@
 	<!-- / Page Scripts -->
 	
 	<script type="module"
-        th:inline="javascript"
-        th:with="adminJavascript=${T(com.mpodda.thymeleaf_sample.thymeleaf.JavascriptUtils).adminJavascript(#ctx)}">
-		[(${adminJavascript})]
+	    th:inline="javascript"
+	    th:with="adminJavascript=${T(com.mpodda.thymeleaf_sample.thymeleaf.JavascriptUtils).adminJavascript(#ctx)}">
+	[(${adminJavascript})]
 	</script>
-	
+
 </body>
 </html>

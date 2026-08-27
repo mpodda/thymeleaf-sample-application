@@ -54,4 +54,23 @@ public class FilterModel implements Serializable {
 	public void setOperator(FilterOperators operator) {
 		this.operator = operator;
 	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if (object == null) {
+			return false;
+		}
+		
+		if (!(object instanceof FilterModel)) {
+			return false;
+		}
+		
+		final FilterModel filterModel = (FilterModel)object;
+		
+		if (this.filterField == null || filterModel.getFilterField() == null) {
+			return false;
+		}
+		
+		return this.filterField.equalsIgnoreCase(filterModel.getFilterField());
+	}
 }

@@ -39,7 +39,6 @@ public class ContinentsController extends BaseController {
 
 	private ContinentDtoValidator continentDtoValidator;
 	
-
 	public ContinentsController(ContinentService continentService, ContinentDtoValidator continentDtoValidator) {
 		this.continentService = continentService;
 		this.continentDtoValidator = continentDtoValidator;
@@ -59,9 +58,6 @@ public class ContinentsController extends BaseController {
 	@GetMapping({"/continents"})
 	public String continents(Model model, HttpSession httpSession) {
 		this.continentsList = this.continentService.allDto();
-		
-//		FilterDto filterDto = new FilterDto();
-//		model.addAttribute("filterDto", filterDto);
 		
 		return "application/continents";
 	}
@@ -93,10 +89,6 @@ public class ContinentsController extends BaseController {
 	public String listContinents( Model model, HttpSession httpSession) {
 		this.continentsList = this.continentService.allDto();
 		
-//		FilterDto filterDto = new FilterDto();
-//		model.addAttribute("filterDto", filterDto);
-
-		
 		return "application/fragments/continents-fragments :: continents-list";
 	}
 	
@@ -123,5 +115,4 @@ public class ContinentsController extends BaseController {
 		
 		return "application/fragments/continents-fragments :: edit-continent";
 	}
-	
 }
