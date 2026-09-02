@@ -6,7 +6,7 @@
     <title>.</title>
 </head>
 
-<th:block th:fragment="grid-fragment(sessionAttribute, gridContent)" th:with="randomSuffix=${pagingAndSortingDto.get(sessionAttribute).randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${pagingAndSortingDto.get(sessionAttribute).randomSuffix}, paging = (${paging} == null ? true : ${paging})">
+<th:block th:fragment="grid-fragment(gridContent)" th:with="randomSuffix=${pagingAndSortingDto.get(sessionAttribute).randomSuffix} == null ? ${#strings.randomAlphanumeric(5)} : ${pagingAndSortingDto.get(sessionAttribute).randomSuffix}, paging = (${paging} == null ? true : ${paging})">
 	<section role="grid-component">
 		<section role="grid-content" th:random-suffix="${randomSuffix}">
 			<section th:replace="${gridContent}"></section>

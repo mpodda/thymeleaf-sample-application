@@ -18,6 +18,12 @@ import com.mpodda.thymeleaf_sample.annotations.PersisterialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SelectialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.AddValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.AdminController;
+import com.mpodda.thymeleaf_sample.annotations.administration.AdminIdParameter;
+import com.mpodda.thymeleaf_sample.annotations.administration.EditValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.ListValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.SaveValueMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.CountryDto;
 import com.mpodda.thymeleaf_sample.service.ContinentFilterService;
 import com.mpodda.thymeleaf_sample.service.ContinentService;
@@ -27,6 +33,7 @@ import com.mpodda.thymeleaf_sample.validators.CountryDtoValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@AdminController(sessionAttribute = "countries", reference = "country")
 @Controller
 public class CountriesController extends BaseController {
 
@@ -52,17 +59,18 @@ public class CountriesController extends BaseController {
 		binder.addValidators(this.countryDtoValidator);
 	}
 
-	@SessionalDto(sessionAttributeName = "countries")
+	@SessionalDto
 	public List<CountryDto> getCountriesList() {
 		return this.countryService.allDto();
 	}
 	
-	@SessionalMethod(sessionAttributeNames = {"countries"})
+	@SessionalMethod
 	@GetMapping({"/countries"})
 	public String continents(Model model, HttpSession httpSession) {
 		return "application/countries";
 	}
 	
+	@AddValueMethod
 	@SelectialMethod(preservedSessionAttributeNames = {"object", "filteredContinents"})
 	@GetMapping({"/new-country"})
 	public String newContinent(Model model, HttpSession httpSession) {
@@ -72,8 +80,9 @@ public class CountriesController extends BaseController {
 		return "application/fragments/countries-fragments :: edit-country";
 	}
 	
+	@EditValueMethod
 	@GetMapping({"/edit-country"})
-	public String editCountry(@RequestParam (required = false) Long countryId, Model model, HttpSession httpSession, HttpServletResponse response) {
+	public String editCountry(@AdminIdParameter @RequestParam (required = false) Long countryId, Model model, HttpSession httpSession, HttpServletResponse response) {
 		try {
 			model.addAttribute("object", this.countryService.dtoByEntityId(countryId));
 		} catch (Exception e) {
@@ -85,13 +94,15 @@ public class CountriesController extends BaseController {
 		return "application/fragments/countries-fragments :: edit-country";
 	}
 	
+	@ListValueMethod
 	@SessionalMethod(sessionAttributeNames = {"countries"})
 	@GetMapping({"/list-countries"})
 	public String listCountries(Model model, HttpSession httpSession) {
 		return "application/fragments/countries-fragments :: countries-list";
 	}
 	
-	@PersisterialMethod(preservedObjectModelAttributeName = "object", preservedModelAttributeNames = {"filteredContinents"})
+	@SaveValueMethod
+	@PersisterialMethod(preservedModelAttributeNames = {"filteredContinents"})
 	@Transactional
 	@PostMapping({"/save-country"})
 	public String saveCountry(@Validated @ModelAttribute CountryDto modelAttribute, Errors errors, Model model, HttpSession httpSession, HttpServletResponse response) {
@@ -109,8 +120,6 @@ public class CountriesController extends BaseController {
 			
 			response.setStatus(HttpStatus.OK.value());
 		}
-		
-		model.addAttribute("filteredContinents", this.continentService.allDto());
 		
 		return "application/fragments/countries-fragments :: edit-country";
 	}

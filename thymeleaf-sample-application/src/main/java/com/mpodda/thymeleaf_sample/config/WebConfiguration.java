@@ -15,9 +15,11 @@ public class WebConfiguration implements WebMvcConfigurer {
 
 	@Override
 	public void addFormatters(@NonNull FormatterRegistry registry) {
+		/*
 		registry.addConverter(new PagingAndSortingDtoConverter());
 		registry.addConverter(new PageNumberDtoConverter());
 		registry.addConverter(new ContinentDtoConverter());
 		registry.addConverter(new CountryDtoConverter());
+		*/
 	}
 }

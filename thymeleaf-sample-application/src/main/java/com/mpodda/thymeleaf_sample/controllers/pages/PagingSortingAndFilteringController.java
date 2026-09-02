@@ -44,6 +44,8 @@ public class PagingSortingAndFilteringController<Dto extends BaseDto> {
 	public String sort(Model model, @ModelAttribute PagingSortingAndFilteringDto pagingAndSortingDto, HttpSession httpSession, HttpServletResponse response) {
 		//System.out.println(String.format("pagingAndSortingDto: %s", Serializer.objectToJsonString(pagingAndSortingDto)));
 		
+		//System.out.println(String.format("pagingAndSortingDto.sessionAttribute=%s",pagingAndSortingDto.getSessionAttribute()));
+		
 		Map<String, PagingSortingAndFilteringDto> modelMap = new HashMap<String, PagingSortingAndFilteringDto>(); 
 		
 		pagingAndSortingDto = defineSortingDirection(pagingAndSortingDto);
@@ -60,7 +62,6 @@ public class PagingSortingAndFilteringController<Dto extends BaseDto> {
 			
 			/* Filtering */
 			if (pagingAndSortingDto.hasFilter()) {
-				//data = new FilteredListHolder<Dto>(data).contains(pagingAndSortingDto.getFilterField(), pagingAndSortingDto.getFilterValue()).getFilteredData();
 				FilteredListHolder<Dto> filteredListHolder = new FilteredListHolder<Dto>(data);
 				
 				pagingAndSortingDto.getFilters().forEach(filter -> {
@@ -81,8 +82,6 @@ public class PagingSortingAndFilteringController<Dto extends BaseDto> {
 				});
 				
 				data = filteredListHolder.getFilteredData();
-				
-				//System.out.println(String.format("data=%s", data));
 			}
 			
 			/* Paging */
@@ -126,17 +125,13 @@ public class PagingSortingAndFilteringController<Dto extends BaseDto> {
 			});
 			
 			model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), modelMap);
+			
+			model.addAttribute("sessionAttribute", sessionAttribute);
 		} else {
 			//TODO: Send an message to a REST end point. End point will transfer the message to via Web socket in order to "refresh" somehow the page in question to create session.
 			//TODO: Investigate later the above idea. ACHTUNG!!! Do not create infinite loop. If after message sending the code lands here again, raise error message to user and 
 			//      do not resent message
 		}
-		
-		
-		//TODO: Remove later
-//		FilterDto filterDto = new FilterDto();
-//		model.addAttribute("filterDto", filterDto);
-		
 		
 		return pagingAndSortingDto.getFragmentUrl();
 	}
@@ -158,41 +153,4 @@ public class PagingSortingAndFilteringController<Dto extends BaseDto> {
 		
 		return sortingDto;
 	}
-
-//	@PostMapping("/filter")
-//	public String filter(Model model, @ModelAttribute PagingSortingAndFilteringDto pagingSortingAndFilterDto /*FilterDto filterDto*/, HttpSession httpSession) {
-//		System.out.println(String.format("filter :: pagingAndSortingDto: %s", Serializer.objectToJsonString(pagingSortingAndFilterDto)));
-//		
-////		System.out.println(String.format("filter :: filterDto:%s", filterDto));
-//		
-//		
-////		Session session = this.sessionRepository.findById(httpSession.getId());
-////		if (session != null && session.getAttribute(SessionalConstants.DATA.value()) != null) {
-////			final Map<String, List<Dto>> sessionMap = (Map<String, List<Dto>>)session.getAttribute(SessionalConstants.DATA.value());
-////			
-////			Map<String, PagingSortingAndFilteringDto> modelMap = new HashMap<String, PagingSortingAndFilteringDto>();
-////			
-////			model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), modelMap);
-////			
-////			//System.out.println(String.format("sessionMap is null? %s", sessionMap == null));
-////			
-//////			if (sessionMap != null) {
-//////				System.out.println("Keys:");
-//////				sessionMap.keySet().forEach(k->{
-//////					System.out.println(k);
-//////				});
-//////			}
-////			
-////			model.addAttribute(filterDto.getSessionAttribute(), sessionMap.get(filterDto.getSessionAttribute()));
-////		}
-////		
-////		return filterDto.getFragmentUrl();
-//		
-//		Map<String, PagingSortingAndFilteringDto> modelMap = new HashMap<String, PagingSortingAndFilteringDto>();
-//		modelMap.put(pagingSortingAndFilterDto.getSessionAttribute(), pagingSortingAndFilterDto);
-//		model.addAttribute(SessionalConstants.PAGING_AND_SORTING_MODEL_ATTRIBUTE.value(), modelMap);
-//		
-//		return pagingSortingAndFilterDto.getFragmentUrl();
-//	}
-	
 }

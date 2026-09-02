@@ -1,3 +1,4 @@
+/*
 import {CountriesAdmin} from './CountriesAdmin.js';
 
 (async () => {
@@ -8,3 +9,4 @@ import {CountriesAdmin} from './CountriesAdmin.js';
 	
 	await init();
 })();
+*/

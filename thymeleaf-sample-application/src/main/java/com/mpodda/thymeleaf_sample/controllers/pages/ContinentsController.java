@@ -49,19 +49,18 @@ public class ContinentsController extends BaseController {
 		binder.addValidators(this.continentDtoValidator);
 	}
 	
-	@SessionalDto(sessionAttributeName = "continents")
+	@SessionalDto
 	public List<ContinentDto> getContinentsList() {
 		return continentsList;
 	}
 	
-	@SessionalMethod(sessionAttributeNames = {"continents"})
+	@SessionalMethod
 	@GetMapping({"/continents"})
 	public String continents(Model model, HttpSession httpSession) {
 		this.continentsList = this.continentService.allDto();
 		
 		return "application/continents";
 	}
-	
 	
 	@AddValueMethod
 	@GetMapping({"/new-continent"})
@@ -93,7 +92,7 @@ public class ContinentsController extends BaseController {
 	}
 	
 	@SaveValueMethod
-	@PersisterialMethod(preservedObjectModelAttributeName = "object")
+	@PersisterialMethod
 	@Transactional
 	@PostMapping({"/save-continent"})
 	public String saveContinent(@Validated @ModelAttribute ContinentDto continentDto, Errors errors, Model model, HttpSession httpSession, HttpServletResponse response) {
@@ -110,8 +109,6 @@ public class ContinentsController extends BaseController {
 			
 			response.setStatus(HttpStatus.OK.value());
 		}
-		
-		model.addAttribute("continent", continentDto);
 		
 		return "application/fragments/continents-fragments :: edit-continent";
 	}

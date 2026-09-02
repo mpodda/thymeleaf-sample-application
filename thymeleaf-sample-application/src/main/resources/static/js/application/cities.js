@@ -1,3 +1,4 @@
+/*
 import {CitiesAdmin} from './CitiesAdmin.js';
 
 (async () => {
@@ -8,3 +9,4 @@ import {CitiesAdmin} from './CitiesAdmin.js';
 	
 	await init();
 })();
+*/

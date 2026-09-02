@@ -24,6 +24,7 @@ import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.BaseDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ps.PagingSortingAndFilteringDto;
 import com.mpodda.thymeleaf_sample.domain.enums.SessionalConstants;
+import com.mpodda.thymeleaf_sample.utils.Serializer;
 import com.mpodda.thymeleaf_sample.web.PagingAndSortingService;
 
 import jakarta.servlet.http.HttpSession;
@@ -39,10 +40,6 @@ public class SessionalAfterReturningAdvice<Dto extends BaseDto> implements After
 	@Autowired
     private FindByIndexNameSessionRepository sessionRepository;
 	
-//	@Autowired
-//	private JdbcIndexedSessionRepository sessionRepository;
-//	private SessionRepository<?> sessionRepository;
-	
 	@Autowired
 	private PagingAndSortingService<Dto> pagingAndSortingService;
 
@@ -57,7 +54,15 @@ public class SessionalAfterReturningAdvice<Dto extends BaseDto> implements After
 				return;
 			}
 			
-			final String[] sessionAttributeNames = method.getAnnotation(SessionalMethod.class).sessionAttributeNames();
+			//final String[] sessionAttributeNames = method.getAnnotation(SessionalMethod.class).sessionAttributeNames();
+			String[] sessionAttributeNames = null;
+			
+			if (method.getAnnotation(SessionalMethod.class).sessionAttributeNames() == null || method.getAnnotation(SessionalMethod.class).sessionAttributeNames().length == 0) {
+				sessionAttributeNames = new String[1];
+				sessionAttributeNames[0] = (String)model.getAttribute("sessionAttribute");
+			} else {
+				sessionAttributeNames = method.getAnnotation(SessionalMethod.class).sessionAttributeNames();
+			}
 			
 			/* Map that be stored in this session */
 			Map<String, List<Dto>> sessionMap = null;
@@ -86,26 +91,29 @@ public class SessionalAfterReturningAdvice<Dto extends BaseDto> implements After
 			
 			final Method[] declaringClassMethods = method.getDeclaringClass().getMethods();
 			
-			for (int i=0; i</*method.getDeclaringClass().getMethods()*/declaringClassMethods.length; i++) {
+			for (int i=0; i< declaringClassMethods.length; i++) {
 				final boolean isSessionalDtoMethod = method.getDeclaringClass().getMethods()[i].getAnnotation(SessionalDto.class) != null;
 				
 				/* Method is 'Sessional' Dto method (Usually 'getter') */
 				if (isSessionalDtoMethod) {
 					/* Session Attribute Name */
-					final String sessionAttributeName = /*method.getDeclaringClass().getMethods()*/declaringClassMethods[i].getAnnotation(SessionalDto.class).sessionAttributeName();
+					final String sessionAttributeName = 
+							model.getAttribute("sessionAttribute") == null ? 
+									declaringClassMethods[i].getAnnotation(SessionalDto.class).sessionAttributeName() : 
+									(String)model.getAttribute("sessionAttribute");
 					
 					/* Attribute belongs to given 'Sessional' method */
 					final boolean isSessionalAttributeOfThisSessionalMethod = Arrays.stream(sessionAttributeNames).anyMatch(s -> s.equals(sessionAttributeName));					
 					
 					if (isSessionalAttributeOfThisSessionalMethod) {
-						final Method sessionalDtoMethod = /*method.getDeclaringClass().getMethods()*/declaringClassMethods[i];
+						final Method sessionalDtoMethod = declaringClassMethods[i];
 						
 						try {
 							/* Get Data */
 							List<Dto> data = (List<Dto>)sessionalDtoMethod.invoke(target);
 							
 							/* Are data should be paged ? */
-							final boolean paging = /*method.getDeclaringClass().getMethods()*/declaringClassMethods[i].getAnnotation(SessionalDto.class).paging();
+							final boolean paging = declaringClassMethods[i].getAnnotation(SessionalDto.class).paging();
 							
 							/* Paging case */
 							if (paging) {
@@ -133,7 +141,7 @@ public class SessionalAfterReturningAdvice<Dto extends BaseDto> implements After
 			if (!sessionMap.isEmpty()) {
 				session.setAttribute(SessionalConstants.DATA.value(), sessionMap);
 				this.sessionRepository.save(session);
-			}			
+			}
 		}
 	}
 }

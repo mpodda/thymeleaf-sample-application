@@ -20,7 +20,7 @@ public class PersisterialPreservationAfterReturningAdvice <Dto extends BaseDto> 
 	@Override
 	public void afterReturning(@Nullable Object returnValue, Method method, Object[] args, @Nullable Object target) throws Throwable {
 		if (AdviceUtils.isPersisterialPreservation(method)) {
-			Model model = AdviceUtils.locateModel(args); 
+			Model model = AdviceUtils.locateModel(args);
 			HttpSession httpSession = AdviceUtils.locateHttpSession(args);
 			
 			if (model == null || httpSession == null) {

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface PersisterialMethod {
-	String preservedObjectModelAttributeName() default "";
+	String preservedObjectModelAttributeName() default "object";
 	
 	String[] preservedModelAttributeNames() default {};
 }

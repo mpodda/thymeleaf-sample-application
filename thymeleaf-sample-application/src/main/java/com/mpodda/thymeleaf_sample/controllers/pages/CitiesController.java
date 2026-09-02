@@ -19,6 +19,12 @@ import com.mpodda.thymeleaf_sample.annotations.PersisterialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SelectialMethod;
 import com.mpodda.thymeleaf_sample.annotations.SessionalDto;
 import com.mpodda.thymeleaf_sample.annotations.SessionalMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.AddValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.AdminController;
+import com.mpodda.thymeleaf_sample.annotations.administration.AdminIdParameter;
+import com.mpodda.thymeleaf_sample.annotations.administration.EditValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.ListValueMethod;
+import com.mpodda.thymeleaf_sample.annotations.administration.SaveValueMethod;
 import com.mpodda.thymeleaf_sample.domain.dto.CityDto;
 import com.mpodda.thymeleaf_sample.domain.dto.ContinentDto;
 import com.mpodda.thymeleaf_sample.domain.dto.CountryDto;
@@ -30,6 +36,7 @@ import com.mpodda.thymeleaf_sample.validators.CityDtoValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@AdminController(sessionAttribute = "cities", reference = "city")
 @Controller
 public class CitiesController extends BaseController {
 	private ContinentService continentService;
@@ -50,18 +57,18 @@ public class CitiesController extends BaseController {
 		binder.addValidators(this.cityDtoValidator);
 	}
 	
-	@SessionalDto(sessionAttributeName = "cities")
+	@SessionalDto
 	public List<CityDto> getCitiesList() {
 		return this.cityService.allDto();
 	}
 	
-	@SessionalMethod(sessionAttributeNames = {"cities"})
+	@SessionalMethod
 	@GetMapping({"/cities"})
 	public String cities(Model model, HttpSession httpSession) {
 		return "application/cities";
 	}
 	
-	
+	@AddValueMethod
 	@SelectialMethod(preservedSessionAttributeNames = {"object", "filteredContinents", "filteredCountries"})
 	@GetMapping({"/new-city"})
 	public String newCity(Model model, HttpSession httpSession, HttpServletResponse response) {
@@ -80,9 +87,10 @@ public class CitiesController extends BaseController {
 		return "application/fragments/cities-fragments :: edit-city";
 	}
 	
+	@EditValueMethod
 	@SelectialMethod(preservedSessionAttributeNames = {"object", "filteredContinents", "filteredCountries"})
 	@GetMapping({"/edit-city"})
-	public String editCity(@RequestParam (required = false) Long cityId, Model model, HttpSession httpSession, HttpServletResponse response) {
+	public String editCity(@AdminIdParameter @RequestParam (required = false) Long cityId, Model model, HttpSession httpSession, HttpServletResponse response) {
 		try {
 			final CityDto cityDto = this.cityService.dtoByEntityId(cityId);
 			model.addAttribute("object", cityDto);
@@ -101,7 +109,8 @@ public class CitiesController extends BaseController {
 		return "application/fragments/cities-fragments :: edit-city";
 	}
 	
-	@PersisterialMethod(preservedObjectModelAttributeName = "object", preservedModelAttributeNames= {"filteredContinents", "filteredCountries"})
+	@SaveValueMethod
+	@PersisterialMethod(preservedModelAttributeNames= {"filteredContinents", "filteredCountries"})
 	@Transactional
 	@PostMapping({"/save-city"})
 	public String saveCity(@Validated @ModelAttribute CityDto modelAttribute, Errors errors, Model model, HttpSession httpSession, HttpServletResponse response) {
@@ -117,26 +126,14 @@ public class CitiesController extends BaseController {
 			}
 			response.setStatus(HttpStatus.OK.value());
 		}
-
-		model.addAttribute("object", modelAttribute);
 		
 		return "application/fragments/cities-fragments :: edit-city";
 	}
 	
-	
+	@ListValueMethod
 	@SessionalMethod(sessionAttributeNames = {"cities"})
 	@GetMapping({"/list-cities"})
 	public String listCities(Model model, HttpSession httpSession) {
 		return "application/fragments/cities-fragments :: cities-list";
 	}
-	
-//	@SelectialMethod(preservedModelAttributeNames = {"object", "filteredContinents"})
-//	@PostMapping("/on-continet-value-change")
-//	public String onContinentValueChange(Model model, HttpSession httpSession, @ModelAttribute OnValueChangeDto onValueChangeDto) throws Exception {
-//		model.addAttribute("filteredCountries", this.countryService.filterByContinent(onValueChangeDto.getValue()));
-//		
-//		//model.addAttribute("randomSuffix", onValueChangeDto.getRandomSuffix());
-//		
-//		return onValueChangeDto.getFragmentUrl();
-//	}
 }
